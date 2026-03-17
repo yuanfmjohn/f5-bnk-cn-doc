@@ -1,236 +1,236 @@
-# Cafe 애플리케이션 배포 가이드 (HTTP/HTTPS)
+# Cafe 应用程序部署指南 (HTTP/HTTPS)
 
-이 가이드는 cafe 애플리케이션을 80(HTTP) 및 443(HTTPS) 포트로 서비스하는 방법을 설명합니다.
+本指南介绍了如何通过 80(HTTP) 和 443(HTTPS) 端口提供 cafe 应用程序服务的方法。
 
-## 📋 사전 요구사항
+## 📋 前提条件
 
-1. **Kubernetes 클러스터** (v1.19 이상 권장)
-2. **Ingress Controller 설치** (NGINX Ingress Controller 권장)
-3. **kubectl** 명령줄 도구
-4. **openssl** (TLS 인증서 생성용)
+1. **Kubernetes 集群** (建议 v1.19 或更高版本)
+2. **安装 Ingress Controller** (建议使用 NGINX Ingress Controller)
+3. **kubectl** 命令行工具
+4. **openssl** (用于生成 TLS 证书)
 
-## 🔧 Ingress Controller 설치
+## 🔧 安装 Ingress Controller
 
-### NGINX Ingress Controller 설치 (미설치 시)
+### 安装 NGINX Ingress Controller (若未安装)
 
 ```bash
-# Helm 사용 시
+# 使用 Helm 时
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 helm install ingress-nginx ingress-nginx/ingress-nginx
 
-# 또는 kubectl 사용 시
+# 或使用 kubectl 时
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/cloud/deploy.yaml
 ```
 
-설치 확인:
+确认安装:
 ```bash
 kubectl get pods -n ingress-nginx
 kubectl get svc -n ingress-nginx
 ```
 
-## 🔐 1단계: Self-signed TLS 인증서 생성
+## 🔐 第 1 步: 生成自签名 TLS 证书
 
-### 방법 1: 스크립트 사용 (권장)
+### 方法 1: 使用脚本 (推荐)
 
 ```bash
-# 실행 권한 부여
+# 赋予执行权限
 chmod +x create-tls-cert.sh
 
-# 기본 도메인(cafe.example.com)으로 실행
+# 以默认域名 (cafe.example.com) 运行
 ./create-tls-cert.sh
 
-# 또는 사용자 지정 도메인으로 실행
+# 或以自定义域名运行
 ./create-tls-cert.sh mycafe.local
 ```
 
-### 방법 2: 수동 생성
+### 方法 2: 手动生成
 
 ```bash
-# 1. 개인키 생성
+# 1. 生成私钥
 openssl genrsa -out cafe-tls.key 2048
 
-# 2. 인증서 서명 요청(CSR) 생성
+# 2. 生成证书签名请求 (CSR)
 openssl req -new -key cafe-tls.key -out cafe-tls.csr \
   -subj "/C=KR/ST=Seoul/L=Seoul/O=MyOrg/OU=IT/CN=cafe.example.com"
 
-# 3. Self-signed 인증서 생성 (1년 유효)
+# 3. 生成自签名证书 (有效期 1 年)
 openssl x509 -req -days 365 -in cafe-tls.csr \
   -signkey cafe-tls.key -out cafe-tls.crt
 
-# 4. Kubernetes Secret 생성
+# 4. 创建 Kubernetes Secret
 kubectl create secret tls cafe-tls-secret \
   --cert=cafe-tls.crt \
   --key=cafe-tls.key
 ```
 
-## 🚀 2단계: 애플리케이션 배포
+## 🚀 第 2 步: 部署应用程序
 
-### TLS Secret 적용 (스크립트 사용 시)
+### 应用 TLS Secret (使用脚本时)
 
 ```bash
 kubectl apply -f cafe-tls-secret.yaml
 ```
 
-### 애플리케이션 매니페스트 적용
+### 应用应用程序清单
 
 ```bash
 kubectl apply -f cafe-app.yaml
 ```
 
-## ✅ 3단계: 배포 확인
+## ✅ 第 3 步: 确认部署
 
-### 리소스 확인
+### 确认资源
 
 ```bash
-# Pod 상태 확인
+# 确认 Pod 状态
 kubectl get pods
 
-# Service 확인
+# 确认 Service
 kubectl get svc
 
-# Ingress 확인
+# 确认 Ingress
 kubectl get ingress cafe-ingress
 
-# Ingress 상세 정보
+# Ingress 详细信息
 kubectl describe ingress cafe-ingress
 ```
 
-### Ingress 외부 IP 확인
+### 确认 Ingress 外部 IP
 
 ```bash
 kubectl get ingress cafe-ingress -o wide
 ```
 
-출력 예시:
+输出示例:
 ```
 NAME           CLASS   HOSTS              ADDRESS        PORTS     AGE
 cafe-ingress   nginx   cafe.example.com   34.123.45.67   80, 443   2m
 ```
 
-## 🌐 4단계: 도메인 설정
+## 🌐 第 4 步: 设置域名
 
-### 로컬 테스트용 hosts 파일 수정
+### 修改本地测试用的 hosts 文件
 
 ```bash
-# Ingress의 외부 IP 확인
+# 确认 Ingress 的外部 IP
 INGRESS_IP=$(kubectl get ingress cafe-ingress -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
-# hosts 파일에 추가 (Linux/Mac)
+# 添加到 hosts 文件 (Linux/Mac)
 echo "$INGRESS_IP cafe.example.com" | sudo tee -a /etc/hosts
 
-# Windows의 경우
-# C:\Windows\System32\drivers\etc\hosts 파일을 관리자 권한으로 열어
-# <INGRESS_IP> cafe.example.com 추가
+# Windows 情况下
+# 以管理员权限打开 C:\Windows\System32\drivers\etc\hosts 文件
+# 添加 <INGRESS_IP> cafe.example.com
 ```
 
-## 🧪 5단계: 테스트
+## 🧪 第 5 步: 测试
 
-### HTTP 테스트 (포트 80)
+### HTTP 测试 (端口 80)
 
 ```bash
-# Coffee 서비스
+# Coffee 服务
 curl http://cafe.example.com/coffee
 
-# Tea 서비스
+# Tea 服务
 curl http://cafe.example.com/tea
 ```
 
-### HTTPS 테스트 (포트 443)
+### HTTPS 测试 (端口 443)
 
-Self-signed 인증서이므로 `-k` 옵션으로 인증서 검증 무시:
+由于是自签名证书，使用 `-k` 选项忽略证书验证:
 
 ```bash
-# Coffee 서비스
+# Coffee 服务
 curl -k https://cafe.example.com/coffee
 
-# Tea 서비스
+# Tea 服务
 curl -k https://cafe.example.com/tea
 ```
 
-### 브라우저 테스트
+### 浏览器测试
 
-1. 브라우저에서 접속:
+1. 在浏览器中访问:
    - `http://cafe.example.com/coffee`
    - `https://cafe.example.com/tea`
 
-2. HTTPS 접속 시 보안 경고가 나타나면:
-   - Chrome: "고급" → "cafe.example.com(으)로 이동(안전하지 않음)" 클릭
-   - Firefox: "고급" → "위험을 감수하고 계속" 클릭
+2. 访问 HTTPS 时如果出现安全警告:
+   - Chrome: 点击 "高级" → "继续前往 cafe.example.com (不安全)"
+   - Firefox: 点击 "高级" → "接受风险并继续"
 
-## 📊 주요 변경 사항
+## 📊 主要变更事项
 
-### 원본 대비 변경된 부분:
+### 相对原版的变更部分:
 
 1. **Service Type**: `NodePort` → `ClusterIP`
-   - Ingress가 외부 접근을 처리하므로 ClusterIP로 변경
+   - 由于 Ingress 处理外部访问，故更改为 ClusterIP
 
-2. **Ingress 리소스 추가**:
-   - HTTP(80) 및 HTTPS(443) 트래픽 라우팅
-   - Path 기반 라우팅: `/coffee`, `/tea`
+2. **添加 Ingress 资源**:
+   - HTTP(80) 及 HTTPS(443) 流量路由
+   - 基于路径的路由: `/coffee`, `/tea`
 
-3. **TLS 설정**:
-   - Self-signed 인증서를 사용한 HTTPS 지원
-   - `cafe-tls-secret` Secret으로 인증서 관리
+3. **TLS 设置**:
+   - 支持使用自签名证书的 HTTPS
+   - 通过 `cafe-tls-secret` Secret 管理证书
 
-## 🔍 트러블슈팅
+## 🔍 故障排除
 
-### Ingress에 외부 IP가 할당되지 않는 경우
+### Ingress 未分配外部 IP 的情况
 
 ```bash
-# Ingress Controller Service 확인
+# 确认 Ingress Controller Service
 kubectl get svc -n ingress-nginx
 
-# LoadBalancer 타입이 Pending 상태라면 클라우드 환경이 아닐 수 있음
-# Minikube/Kind 등 로컬 환경에서는 다음 사용:
+# 如果 LoadBalancer 类型处于 Pending 状态，可能不是云环境
+# 在 Minikube/Kind 等本地环境中，请使用以下方法:
 
 # Minikube
 minikube tunnel
 
-# Kind (포트 포워딩 사용)
+# Kind (使用端口转发)
 kubectl port-forward -n ingress-nginx service/ingress-nginx-controller 8080:80 8443:443
-# 그 후 http://localhost:8080/coffee 로 접속
+# 之后通过 http://localhost:8080/coffee 访问
 ```
 
-### 인증서 오류
+### 证书错误
 
 ```bash
-# Secret 확인
+# 确认 Secret
 kubectl get secret cafe-tls-secret
 kubectl describe secret cafe-tls-secret
 
-# Secret 재생성
+# 重新生成 Secret
 kubectl delete secret cafe-tls-secret
 ./create-tls-cert.sh
 kubectl apply -f cafe-tls-secret.yaml
 ```
 
-### 503 Service Unavailable 오류
+### 503 Service Unavailable 错误
 
 ```bash
-# Pod 상태 확인
+# 确认 Pod 状态
 kubectl get pods
 
-# Pod 로그 확인
+# 确认 Pod 日志
 kubectl logs -l app=coffee
 kubectl logs -l app=tea
 
-# Service 엔드포인트 확인
+# 确认 Service 端点 (Endpoints)
 kubectl get endpoints coffee-svc tea-svc
 ```
 
-## 🎯 프로덕션 환경 권장사항
+## 🎯 生产环境建议事项
 
-1. **유효한 TLS 인증서 사용**:
-   - Let's Encrypt (cert-manager 사용)
-   - 상용 CA 인증서
+1. **使用有效的 TLS 证书**:
+   - Let's Encrypt (使用 cert-manager)
+   - 商业 CA 证书
 
-2. **cert-manager 설치** (자동 인증서 관리):
+2. **安装 cert-manager** (自动管理证书):
    ```bash
    kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
    ```
 
-3. **리소스 제한 설정**:
+3. **设置资源限制**:
    ```yaml
    resources:
      requests:
@@ -241,7 +241,7 @@ kubectl get endpoints coffee-svc tea-svc
        memory: 256Mi
    ```
 
-4. **Health Check 추가**:
+4. **添加健康检查 (Health Check)**:
    ```yaml
    livenessProbe:
      httpGet:
@@ -253,15 +253,15 @@ kubectl get endpoints coffee-svc tea-svc
        port: 8080
    ```
 
-## 📝 참고 사항
+## 📝 备注事项
 
-- Self-signed 인증서는 개발/테스트 환경에만 사용하세요
-- 프로덕션 환경에서는 신뢰할 수 있는 CA의 인증서를 사용하세요
-- Ingress Controller의 종류(NGINX, Traefik, HAProxy 등)에 따라 annotations가 다를 수 있습니다
-- 도메인은 실제 환경에 맞게 수정하세요
+- 自签名证书仅用于开发/测试环境
+- 在生产环境中，请使用受信任 CA 颁发的证书
+- 根据 Ingress Controller 的种类 (NGINX, Traefik, HAProxy 等)，annotations 可能会有所不同
+- 请根据实际环境修改域名
 
-## 🔗 유용한 링크
+## 🔗 有用链接
 
-- [Kubernetes Ingress 문서](https://kubernetes.io/docs/concepts/services-networking/ingress/)
+- [Kubernetes Ingress 文档](https://kubernetes.io/docs/concepts/services-networking/ingress/)
 - [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/)
-- [cert-manager 문서](https://cert-manager.io/docs/)
+- [cert-manager 文档](https://cert-manager.io/docs/)

@@ -1,47 +1,47 @@
-#### Kubernetes Gateway API TLS 구성 w/ F5 BIG-IP Next for Kubernetes(BNK)
+#### Kubernetes Gateway API TLS 配置 w/ F5 BIG-IP Next for Kubernetes(BNK)
 
-> 원본 문서: [TLS Configuration - Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/guides/tls/)
+> 原文文档: [TLS Configuration - Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/guides/tls/)
 
-## 목차
+## 目录
 
-- [개요](#개요)
-- [Client/Server와 TLS](#clientserver와-tls)
+- [概览](#概览)
+- [客户端/服务器与 TLS](#客户端服务器与-tls)
 - [Downstream TLS](#downstream-tls)
-  - [Listener와 TLS](#listener와-tls)
-  - [예제](#downstream-tls-예제)
+  - [Listener 与 TLS](#listener-与-tls)
+  - [示例](#downstream-tls-示例)
 - [Upstream TLS](#upstream-tls)
-  - [TargetRef와 TLS](#targetref와-tls)
-  - [예제](#upstream-tls-예제)
-- [Extension](#extension)
+  - [TargetRef 与 TLS](#targetref-与-tls)
+  - [示例](#upstream-tls-示例)
+- [扩展 (Extension)](#extension)
 
 ---
 
-## 개요
+## 概览
 
-Gateway API는 다양한 방법으로 TLS를 구성할 수 있습니다. 이 테스트에서는 다양한 TLS 설정을 설명하고 효과적으로 사용하는 가이드 라인을 제공합니다. 이 테스트에서는 Gateway를 F5 BNK를 사용하였으며, 일반적인 Native API외 확장된 내용을 포함하고 있습니다. F5 BNK와 같은 일부 구현체에서는 다른 형태 또는 더 고급 형태의 TLS 구성을 허용할 수 있습니다.
+Gateway API 可以通过多种方式配置 TLS。本次测试说明了各种 TLS 设置，并提供了有效使用的指南。本次测试使用 F5 BNK 作为 Gateway，包含了除通用 Native API 之外的扩展内容。在 F5 BNK 等部分实现中，可能允许其他形式或更高级形式的 TLS 配置。
 
-Gateway의 경우 2가지 연결을 사용하여 관리합니다. 
--  downstream: 클라이언트와 Gateway 사이의 연결입니다.
--  upstream: Gateway와 route에 의해 지정된 backend 리소스 사이의 연결입니다. 이 연결이 일반적인 backend services 연결을 의미합니다. 
+针对 Gateway，使用两种连接进行管理: 
+-  downstream: 客户端与 Gateway 之间的连接。
+-  upstream: Gateway 与由 route 指定的 backend 资源之间的连接。此连接指通常的 backend services 连接。 
 
 ### ⚠️ Experimental Channel
 
-아래에 설명된 `TLSRoute` 리소스는 현재 Gateway API의 "Experimental" 채널에만 포함되어 있습니다. release 채널에 대한 자세한 내용은 [versioning guide](https://gateway-api.sigs.k8s.io/concepts/versioning/)를 참조하세요.
+下方说明的 `TLSRoute` 资源目前仅包含在 Gateway API 的 "Experimental" 频道中。有关 release 频道的详细信息，请参阅 [版本指南 (versioning guide)](https://gateway-api.sigs.k8s.io/concepts/versioning/)。
 
 ---
 
-## Client/Server와 TLS
+## 客户端/服务器与 TLS
 
-Gateway의 경우 두 가지 연결이 관련됩니다:
+针对 Gateway，涉及两种连接：
 
-- **downstream**: 클라이언트와 Gateway 사이의 연결입니다.
-- **upstream**: Gateway와 route에 의해 지정된 backend 리소스 사이의 연결입니다. 이러한 backend 리소스는 일반적으로 Service입니다.
+- **downstream**: 客户端与 Gateway 之间的连接。
+- **upstream**: Gateway 与由 route 指定的 backend 资源之间的连接。这些 backend 资源通常是 Service。
 
-Gateway API를 사용하면 downstream 및 upstream 연결의 TLS 구성이 독립적으로 관리됩니다.
+使用 Gateway API，downstream 和 upstream 连接的 TLS 配置是独立管理的。
 
-### Downstream 연결의 Listener Protocol과 TLS Mode
+### Downstream 连接的 Listener Protocol 和 TLS Mode
 
-downstream 연결의 경우, Listener Protocol에 따라 다른 TLS mode와 Route type이 지원됩니다.
+对于 downstream 连接，根据 Listener Protocol 支持不同的 TLS mode 和 Route type。
 
 | Listener Protocol | TLS Mode | Route Type Supported |
 |-------------------|----------|---------------------|
@@ -50,45 +50,45 @@ downstream 연결의 경우, Listener Protocol에 따라 다른 TLS mode와 Rout
 | HTTPS | Terminate | HTTPRoute |
 | GRPC | Terminate | GRPCRoute |
 
-> **참고**: `Passthrough` TLS mode의 경우, 클라이언트로부터의 TLS 세션이 Gateway에서 종료되지 않고 암호화된 상태로 Gateway를 통과하기 때문에 TLS 설정이 적용되지 않습니다.
+> **备注**: 对于 `Passthrough` TLS mode，来自客户端的 TLS 会话不会在 Gateway 终止，而是以加密状态通过 Gateway，因此不会应用 TLS 设置。
 
-### Upstream 연결
+### Upstream 连接
 
-upstream 연결의 경우, `BackendTLSPolicy`가 사용되며, listener protocol이나 TLS mode는 upstream TLS 구성에 적용되지 않습니다. `HTTPRoute`의 경우, `Terminate` TLS mode와 `BackendTLSPolicy`를 함께 사용하는 것이 지원됩니다. 이들을 함께 사용하면 일반적으로 Gateway에서 종료되고 재암호화되는 연결로 알려진 것을 제공합니다.
+对于 upstream 连接，使用 `BackendTLSPolicy`，并且 listener protocol 或 TLS mode 不会应用于 upstream TLS 配置。对于 `HTTPRoute`，支持同时使用 `Terminate` TLS mode 和 `BackendTLSPolicy`。将它们结合使用可以提供通常所说的在 Gateway 终止并重新加密的连接。
 
-`TLSRoute`에서 `Terminate`의 사용은 `Extended` [Support Level](https://gateway-api.sigs.k8s.io/concepts/conformance/#2-support-levels)에서 사용 가능합니다.
+在 `TLSRoute` 中使用 `Terminate` 可以在 `Extended` [Support Level](https://gateway-api.sigs.k8s.io/concepts/conformance/#2-support-levels) 中使用。
 
 ---
 
 ## Downstream TLS
 
-Downstream TLS 설정은 Gateway 레벨에서 listener를 사용하여 구성됩니다.
+Downstream TLS 设置是在 Gateway 级别使用 listener 配置的。
 
-### Listener와 TLS
+### Listener 与 TLS
 
-Listener는 도메인 또는 서브도메인별로 TLS 설정을 노출합니다. listener의 TLS 설정은 `hostname` 기준을 만족하는 모든 도메인에 적용됩니다.
+Listener 按域名或子域名公开 TLS 设置。listener 的 TLS 设置应用于满足 `hostname` 标准的所有域名。
 
-다음 예제에서 Gateway는 모든 요청에 대해 `default-cert` Secret 리소스에 정의된 TLS 인증서를 제공합니다. 예제는 HTTPS 프로토콜을 참조하지만, TLSRoute와 함께 TLS 전용 프로토콜에도 동일한 기능을 사용할 수 있습니다.
+在以下示例中，Gateway 为所有请求提供 `default-cert` Secret 资源中定义的 TLS 证书。示例虽然引用了 HTTPS 协议，但同样的功能也可以用于带有 TLSRoute 的 TLS 专用协议。
 
 ```yaml
 listeners:
-- protocol: HTTPS # 다른 가능한 값은 `TLS`
+- protocol: HTTPS # 其他可能的值为 `TLS`
   port: 443
   tls:
-    mode: Terminate # protocol이 `TLS`인 경우, `Passthrough`가 가능한 mode
+    mode: Terminate # 如果 protocol 是 `TLS`，`Passthrough` 是可选模式
     certificateRefs:
     - kind: Secret
       group: ""
       name: default-cert
 ```
 
-### Downstream TLS 예제
+### Downstream TLS 示例
 
-#### 1. 다른 인증서를 가진 Listener
+#### 1. 拥有不同证书的 Listener
 
-이 예제에서 F5 BNK Gateway는 `coffee.f5bnk.com` 및 `tea.f5bnk.com` 도메인을 제공하도록 구성되어 있습니다. 이러한 도메인에 대한 인증서는 Gateway에서 지정됩니다.
+在此示例中，F5 BNK Gateway 被配置为提供 `coffee.f5bnk.com` 和 `tea.f5bnk.com` 域名。这些域名的证书在 Gateway 中指定。
 
-POST Method을 사용하는 특정 URL에 대해서 GET 요청으로 변환하는 HTTP Route를 생성합니다.
+创建一个将特定 URL 的 POST 方法转换为 GET 请求的 HTTP Route。
 
 ```yaml
 aapiVersion: gateway.networking.k8s.io/v1
@@ -120,7 +120,7 @@ spec:
 
 #### 2. Wildcard TLS Listener
 
-이 예제에서 Gateway는 `*.example.com`에 대한 wildcard 인증서와 `coffee.f5bnk.com`에 대한 다른 인증서로 구성되어 있습니다. 특정 일치가 우선하므로 Gateway는 `coffee.f5bnk.com`에 대한 요청에는 `coffee-f5bnk-com-cert`를 제공하고 다른 모든 요청에는 `wildcard-f5bnk-com-cert`를 제공합니다.
+在此示例中，Gateway 配置了针对 `*.example.com` 的通配符证书和针对 `coffee.f5bnk.com` 的另一个证书。由于特定匹配优先，Gateway 会为 `coffee.f5bnk.com` 的请求提供 `coffee-f5bnk-com-cert`，为其他所有请求提供 `wildcard-f5bnk-com-cert`。
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -166,9 +166,9 @@ spec:
       - kind: HTTPRoute
 ```
 
-#### 3. Cross Namespace 인증서 참조
+#### 3. 跨命名空间 (Cross Namespace) 证书引用
 
-이 예제에서 Gateway는 다른 namespace의 인증서를 참조하도록 구성되어 있습니다. 이는 대상 namespace에서 생성된 ReferenceGrant에 의해 허용됩니다. 해당 ReferenceGrant가 없으면 cross-namespace 참조는 유효하지 않습니다.
+在此示例中，Gateway 被配置为引用其他命名空间的证书。这是通过在目标命名空间中创建的 ReferenceGrant 允许的。如果没有该 ReferenceGrant，跨命名空间引用将失效。
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -208,7 +208,7 @@ spec:
 
 ```
 
-테스트 결과(curl)
+测试结果 (curl)
 
 ```shell
 » curl -sk -L --resolve www.f5bnk.com:80:192.168.48.202 -X POST -d "abc" http://www.f5bnk.com/latte/coffee -vvv --max-redirs 1                                ~
@@ -228,7 +228,7 @@ spec:
 * Please rewind output before next send
 < Location: http://www.f5bnk.com/black/tea
 < Server: BigIP
-* HTTP/1.0 connection set to keep alive
+* HTTP 1.0 connection set to keep alive
 < Connection: Keep-Alive
 < Content-Length: 0
 <
@@ -247,7 +247,7 @@ spec:
 < HTTP/1.0 303 See Other
 < Location: http://www.f5bnk.com/black/tea
 < Server: BigIP
-* HTTP/1.0 connection set to keep alive
+* HTTP 1.0 connection set to keep alive
 < Connection: Keep-Alive
 < Content-Length: 0
 <
@@ -255,44 +255,44 @@ spec:
 * Maximum (1) redirects followed
 ```
 
-`http://www.f5bnk.com/latte/coffee` 및 POST Method를 사용한 요청은 `http://www.f5bnk.com/black/tea` GET 요청으로 변환하여 Redirect 합니다.
+对 `http://www.f5bnk.com/latte/coffee` 使用 POST 方法发起的请求将转换为 `http://www.f5bnk.com/black/tea` 的 GET 请求并进行重定向。
 
 
 ---
 
 ## Upstream TLS
 
-Upstream TLS 설정은 target reference를 통해 `Service`에 연결된 `BackendTLSPolicy`를 사용하여 구성됩니다.
+Upstream TLS 设置是通过 target reference 连接到 `Service` 的 `BackendTLSPolicy` 配置的。
 
-이 리소스는 Gateway가 backend에 연결할 때 사용해야 하는 SNI와 backend Pod(s)에서 제공하는 인증서가 어떻게 검증되어야 하는지를 설명하는 데 사용할 수 있습니다.
+该资源可用于描述 Gateway 在连接到 backend 时应使用的 SNI，以及应如何验证 backend Pod(s) 提供的证书。
 
-### TargetRef와 TLS
+### TargetRef 与 TLS
 
-BackendTLSPolicy는 `TargetRefs`와 `Validation`에 대한 명세를 포함합니다:
+BackendTLSPolicy 包含关于 `TargetRefs` 和 `Validation` 的规范：
 
-- **TargetRefs**: 필수이며 HTTPRoute가 TLS를 필요로 하는 하나 이상의 `Service`를 식별합니다.
-- **Validation**: 필수 `Hostname`과 `CACertificateRefs` 또는 `WellKnownCACertificates` 중 하나를 포함합니다.
+- **TargetRefs**: 必需，标识 HTTPRoute 需要 TLS 的一个或多个 `Service`。
+- **Validation**: 必需，包含 `Hostname` 和 `CACertificateRefs` 或 `WellKnownCACertificates` 之一。
 
 #### Hostname
 
-Gateway가 backend에 연결할 때 사용해야 하는 SNI를 나타내며, backend pod에서 제공하는 인증서와 일치해야 합니다.
+表示 Gateway 连接到 backend 时应使用的 SNI，必须与 backend pod 提供的证书匹配。
 
 #### CACertificateRefs
 
-하나 이상의 PEM으로 인코딩된 TLS 인증서를 참조합니다. 사용할 특정 인증서가 없는 경우, WellKnownCACertificates를 "System"으로 설정하여 Gateway가 신뢰할 수 있는 CA 인증서 세트를 사용하도록 해야 합니다.
+引用一个或多个 PEM 编码的 TLS 证书。如果没有特定的证书可供使用，应将 WellKnownCACertificates 设置为 "System"，使 Gateway 使用一组受信任的 CA 证书。
 
-> **참고**: 각 구현체에서 사용되는 시스템 인증서에는 약간의 차이가 있을 수 있습니다. 자세한 내용은 선택한 구현체의 문서를 참조하세요.
+> **备注**: 每个实现中使用的系统证书可能会有细微差别。详情请参阅所选实现的文档。
 
-#### 제한사항
+#### 限制事项
 
-- ❌ Cross-namespace 인증서 참조는 허용되지 않습니다.
-- ❌ Wildcard hostname은 허용되지 않습니다.
+- ❌ 不允许跨命名空间 (Cross-namespace) 证书引用。
+- ❌ 不允许使用通配符域名 (Wildcard hostname)。
 
-### Upstream TLS 예제
+### Upstream TLS 示例
 
-#### 1. System Certificate 사용
+#### 1. 使用系统证书 (System Certificate)
 
-이 예제에서 `BackendTLSPolicy`는 `dev` Service를 지원하는 Pod가 `dev.example.com`에 대한 유효한 인증서를 제공할 것으로 예상되는 TLS로 암호화된 upstream 연결에 연결하기 위해 시스템 인증서를 사용하도록 구성되어 있습니다.
+在此示例中，`BackendTLSPolicy` 被配置为使用系统证书，以便连接到由 `dev` Service 支持的 Pod。预计 Pod 将为 TLS 加密的 upstream 连接提供 `dev.example.com` 的有效证书。
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -309,9 +309,9 @@ spec:
     hostname: dev.example.com
 ```
 
-#### 2. 명시적 CA Certificate 사용
+#### 2. 使用显式 CA 证书
 
-이 예제에서 `BackendTLSPolicy`는 `auth` Service를 지원하는 Pod가 `auth.example.com`에 대한 유효한 인증서를 제공할 것으로 예상되는 TLS로 암호화된 upstream 연결에 연결하기 위해 configuration map `auth-cert`에 정의된 인증서를 사용하도록 구성되어 있습니다.
+在此示例中，`BackendTLSPolicy` 被配置为使用配置映射 (configuration map) `auth-cert` 中定义的证书，以便连接到由 `auth` Service 支持的 Pod。预计 Pod 将为 TLS 加密的 upstream 连接提供 `auth.example.com` 的有效证书。
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -333,19 +333,19 @@ spec:
 
 ---
 
-## Extension
+## 扩展 (Extension)
 
-Gateway TLS 구성은 구현별 기능에 대한 추가 TLS 설정을 추가하기 위한 `options` map을 제공합니다. 
+Gateway TLS 配置提供了一个 `options` 映射，用于添加针对特定实现的额外 TLS 设置。 
 
-여기에 포함될 수 있는 기능의 예:
-- TLS 버전 제한
-- 사용할 암호화 방식(cipher)
+此处可能包含的功能示例：
+- TLS 版本限制
+- 要使用的加密算法 (cipher)
 
 ---
 
-## 참고 자료
+## 参考资料
 
-- [Kubernetes Gateway API 공식 문서](https://gateway-api.sigs.k8s.io/)
+- [Kubernetes Gateway API 官方文档](https://gateway-api.sigs.k8s.io/)
 - [Gateway API Versioning Guide](https://gateway-api.sigs.k8s.io/concepts/versioning/)
 - [Conformance and Support Levels](https://gateway-api.sigs.k8s.io/concepts/conformance/)
 

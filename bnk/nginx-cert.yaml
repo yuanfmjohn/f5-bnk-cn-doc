@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nginx-cert
+  namespace: ns-app
+spec:
+  secretName: nginx-tls
+  issuerRef:
+    name: f5-bnk-ca-cluster-issuer        # ← 실제 ClusterIssuer 이름
+    kind: ClusterIssuer
+  commonName: nginx.ns-app.svc.cluster.local
+  dnsNames:
+    - nginx
+    - nginx.ns-app
+    - nginx.ns-app.svc
+    - nginx.ns-app.svc.cluster.local

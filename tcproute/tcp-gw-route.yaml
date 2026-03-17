@@ -1,0 +1,40 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gw-tcp
+  namespace: web
+spec:
+  addresses:
+  - type: "IPAddress"
+    value: 192.168.48.202
+  gatewayClassName: f5-gateway-class
+  listeners:
+  - name: coffee
+    protocol: TCP
+    port: 6010
+    allowedRoutes:
+      kinds:
+      - kind: L4Route
+        group: gateway.k8s.f5net.com
+  - name: tea
+    protocol: TCP
+    port: 6020
+    allowedRoutes:
+      kinds:
+      - kind: L4Route
+        group: gateway.k8s.f5net.com
+---
+apiVersion: gateway.k8s.f5net.com/v1
+kind: L4Route
+metadata:
+  name: tcp-app-2
+  namespace: web
+spec:
+  protocol: TCP
+  parentRefs:
+  - name: gw-tcp
+    sectionName: tea
+  rules:
+  - backendRefs:
+    - name: tea-svc
+      port: 80

@@ -1,0 +1,15 @@
+# fluentd-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: f5-toda-fluentd
+  namespace: f5-utils
+spec:
+  selector:
+    app: fluentd  # Fluentd Pod의 실제 레이블 확인
+  ports:
+  - name: forward
+    port: 24224
+    targetPort: 24224
+    protocol: TCP
+  type: ClusterIP

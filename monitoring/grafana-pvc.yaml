@@ -1,0 +1,33 @@
+# grafana-nfs-pv.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: grafana-nfs-pv
+  namespace: f5-bnk
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: 192.168.47.242
+    path: "/srv/nfs/bnk"
+  mountOptions:
+    - nfsvers=3
+    - hard
+    - nolock
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grafana-storage
+  namespace: f5-bnk
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+  volumeName: grafana-nfs-pv
+  storageClassName: ""

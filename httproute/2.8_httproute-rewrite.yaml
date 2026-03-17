@@ -1,0 +1,83 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: rewrite-gw
+  namespace: web
+spec:
+  addresses:
+  - type: "IPAddress"
+    value: 192.168.48.202
+  gatewayClassName: f5-gateway-class
+  listeners:
+  - name: http-rewrite
+    protocol: HTTP
+    port: 80
+    allowedRoutes:
+      namespaces:
+        from: "All"
+      kinds:
+      - kind: HTTPRoute
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-rewrite
+  namespace: web
+spec:
+  hostnames:
+    - old.f5bnk.com
+  parentRefs:
+  - name: rewrite-gw
+    sectionName: http-rewrite
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /ip
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /headers
+        statusCode: 302
+  - backendRefs:
+    - name: httpbin
+      port: 8080
+---
+apiVersion: "k8s.f5net.com/v1"
+kind: F5BigCneIrule
+metadata:
+  name: irule-rewrite
+  namespace: web
+spec:
+  iRule: >
+    when HTTP_REQUEST {
+      if { [HTTP::uri] starts_with "/ip" && [HTTP::host] eq "old.f5bnk.com" } {
+        set new_uri [string map -nocase {"/ip" "/headers"} [HTTP::uri]]
+        HTTP::uri $new_uri
+        HTTP::host "new.f5bnk.com"
+      } elseif { [HTTP::uri] starts_with "/user-agent" && [HTTP::host] eq "old.f5bnk.com" } {
+        set new_uri "/headers"
+        HTTP::uri $new_uri
+        HTTP::host "new.f5bnk.com"
+      }
+    }
+---
+apiVersion: "gateway.k8s.f5net.com/v1alpha1"
+kind: BNKNetPolicy
+metadata:
+  name: netpolicy-rewrite
+  namespace: web
+spec:
+  extensionRefs:
+  - kind: F5BigCneIrule
+    name: irule-rewrite
+    group: k8s.f5net.com
+  targetRefs:
+  - kind: Gateway
+    name: rewrite-gw
+    group: gateway.networking.k8s.io
+    sectionName: http-rewrite
+
+

@@ -1,0 +1,82 @@
+# Check if fluentbit sidecar enabled with tls
+{{- if .Values.fluentbit_sidecar}}
+{{- if and (.Values.fluentbit_sidecar.enabled) (.Values.fluentbit_sidecar.fluentbit.tls.enabled)}}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-flofluentbit-tcp-clt
+  namespace: {{ .Release.Namespace }}
+spec:
+  subject:
+    countries:
+      - US
+    provinces:
+      - Washington
+    localities:
+      - Seattle
+    organizations:
+      - F5 Networks
+    organizationalUnits:
+      - PD
+  emailAddresses:
+    - clientcert@f5net.com
+  commonName: f5net.com
+  dnsNames:
+    - f5net
+  # SecretName is the name of the secret resource that will be automatically created and managed by this Certificate resource.
+  # It will be populated with a private key and certificate, signed by the denoted issuer.
+  secretName: tls-flofluentbit-tcp-clt-secret
+  # IssuerRef is a reference to the issuer for this certificate.
+  issuerRef:
+    name: {{ .Values.global.certmgr.clusterIssuer | required ".Values.global.certmgr.clusterIssuer is required." }}
+    kind: ClusterIssuer
+    group: cert-manager.io
+  # Lifetime of the Certificate 180 days (long-lived).
+  duration: 1h
+  privateKey:
+    rotationPolicy: Always
+    encoding: PKCS1
+    algorithm: RSA
+    size: 4096
+  revisionHistoryLimit: 10
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tls-flofluentbitqkview-grpc-svr
+  namespace: {{ .Release.Namespace }}
+spec:
+  subject:
+    countries:
+      - US
+    provinces:
+      - Washington
+    localities:
+      - Seattle
+    organizations:
+      - F5 Networks
+    organizationalUnits:
+      - PD
+  emailAddresses:
+    - clientcert@f5net.com
+  commonName: f5net.com
+  dnsNames:
+    - f5net
+  # SecretName is the name of the secret resource that will be automatically created and managed by this Certificate resource.
+  # It will be populated with a private key and certificate, signed by the denoted issuer.
+  secretName: tls-flofluentbitqkview-grpc-svr-secret
+  # IssuerRef is a reference to the issuer for this certificate.
+  issuerRef:
+    name: {{ .Values.global.certmgr.clusterIssuer | required ".Values.global.certmgr.clusterIssuer is required." }}
+    kind: ClusterIssuer
+    group: cert-manager.io
+  # Lifetime of the Certificate 180 days (long-lived).
+  duration: 1h
+  privateKey:
+    rotationPolicy: Always
+    encoding: PKCS1
+    algorithm: RSA
+    size: 4096
+  revisionHistoryLimit: 10
+{{- end }}
+{{- end }}

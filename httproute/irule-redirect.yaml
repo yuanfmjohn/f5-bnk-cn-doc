@@ -1,0 +1,10 @@
+apiVersion: "k8s.f5net.com/v1"
+kind: F5BigCneIrule
+metadata:
+  name: irule-redirect
+  namespace: web
+spec:
+  iRule: >
+    when HTTP_REQUEST {
+    HTTP::respond 301 Location "https://[getfield [HTTP::host] ":" 1][HTTP::uri]"
+    }

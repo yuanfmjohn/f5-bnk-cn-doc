@@ -1,0 +1,184 @@
+{{- if not (.Values.skipCertMgr | default false) }}
+  {{ $cert := lookup "apiextensions.k8s.io/v1" "CustomResourceDefinition" "" "certificates.cert-manager.io" }}
+  {{ $clusterissuer := lookup "apiextensions.k8s.io/v1" "CustomResourceDefinition" "" "clusterissuers.cert-manager.io" }}
+  {{- if not (or $cert $clusterissuer) }}
+  {{- fail "The cert-manager CRDs are not available. Please install cert-manager before proceeding." }}
+  {{- end }}
+{{- else }}
+  {{- /* Skipping cert-manager CRD validation during template rendering */ -}}
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "f5-lifecycle-operator.fullname" . }}
+  namespace: {{ include "f5-lifecycle-operator.namespace" . }}
+  labels:
+    {{- include "f5-lifecycle-operator.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "f5-lifecycle-operator.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "f5-lifecycle-operator.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- if .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml .Values.global.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ template "f5-lifecycle-operator.serviceAccountName" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ template "f5-lifecycle-operator.image" (tuple .Values.image $.Chart.AppVersion .Values.image.repository) }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: "GOMAXPROCS"
+              valueFrom:
+                resourceFieldRef:
+                  resource: limits.cpu
+                  divisor: "1"
+            - name: "LOG_LEVEL"
+              value: {{ .Values.logLevel }}
+            - name: "USING_CERT_ORCHESTRATOR"
+              value: "true"
+            - name: "POD_NAMESPACE"
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            {{- if and .Values.fluentbit_sidecar .Values.fluentbit_sidecar.enabled }}
+            - name: "FLUENTBIT_ENABLED"
+              value: "true"
+            {{- end }}
+            - name: "ENVDISCOVERY_DISABLEGENERIC"
+              value: {{ .Values.envDiscovery.disableGenerics | default "false" | quote }}
+            - name: "ENVDISCOVERY_DISABLEANNOTATIONS"
+              value: {{ .Values.envDiscovery.disableAnnotations | default "false" | quote }}
+            - name: "ENVDISCOVERY_DISABLEVFS"
+              value: {{ .Values.envDiscovery.disableVFs | default "false" | quote }}
+            - name: "ENVDISCOVERY_DISABLEHUGEPAGES"
+              value: {{ .Values.envDiscovery.disableHugepages | default "false" | quote }}
+            - name: "ENVDISCOVERY_DISABLESFCONFIG"
+              value: {{ .Values.envDiscovery.disableSFConfig | default "false" | quote }}
+            - name: "ENVDISCOVERY_DISABLESERVERCONFIG"
+              value: {{ .Values.envDiscovery.disableServerConfig | default "false" | quote }}
+            - name: "ENVDISCOVERY_DISABLETAINTS"
+              value: {{ .Values.envDiscovery.disableTaints | default "false" | quote }}
+            - name: "ENVDISCOVERY_DISABLELABELS"
+              value: {{ .Values.envDiscovery.disableLabels | default "false" | quote }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          volumeMounts:
+            - mountPath: /var/crash
+              name: f5-core-store
+              readOnly: false
+            - name: flo-dir-tmp-volume
+              mountPath: /tmp
+              subPath: flo-fluentbit-tmp
+              readOnly: false
+            - name: flo-dir-run-volume
+              mountPath: /run
+              subPath: flo-fluentbit-run
+              readOnly: false
+          {{- if and .Values.fluentbit_sidecar .Values.fluentbit_sidecar.enabled }}
+            - name: f5-log-pipes
+              mountPath: /var/run/f5
+          {{- end }}
+        {{- if and .Values.fluentbit_sidecar .Values.fluentbit_sidecar.enabled }}
+        - name: {{ .Values.fluentbit_sidecar.name }}
+          image: "{{template "f5-lifecycle-operator.image" (tuple .Values.fluentbit_sidecar.image .Values.fluentbit_sidecar.image.tag .Values.image.repository) }}"
+          imagePullPolicy: {{ .Values.pullPolicy }}
+          {{- with .Values.fluentbit_sidecar.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            privileged: false
+            readOnlyRootFilesystem: true
+          stdin: true
+          tty: true
+          env:
+            - name: NODE
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: POD_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: POD
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: "USING_CERT_ORCHESTRATOR"
+              value: "true"
+            - name: "CONTAINER_NAME"
+              value: "flofluentbit"
+            - name: "QK_GRPC_PORT"
+              value: "19899"
+          volumeMounts:
+            - mountPath: /var/crash
+              name: f5-core-store
+              readOnly: false
+            - name: fluentbit-storage
+              mountPath: /fluent-bit/storage
+              readOnly: false
+            - name: f5-log-pipes
+              mountPath: /var/run/f5
+              readOnly: true
+            - name: flo-dir-run-volume
+              mountPath: /run
+              subPath: fluentbit-run
+              readOnly: false
+            - name: flo-dir-tmp-volume
+              mountPath: /tmp
+              subPath: fluentbit-tmp
+              readOnly: false
+            - name: f5-flo-fluentbit-config
+              mountPath: /fluent-bit/etc
+            - name: tls-flofluentbitqkview-grpc-svr-volume
+              mountPath: /tls/flofluentbit/grpc/svr
+              readOnly: true
+          {{- if .Values.fluentbit_sidecar.fluentbit.tls.enabled }}
+            - name: tls-flofluentbit-tcp-clt-volume
+              mountPath: /tls/flofluentbit/tcp/clt
+              readOnly: true
+          {{- end }}
+        {{- end }}
+      volumes:
+        - name: f5-core-store
+          hostPath:
+            path: /home/crash/f5
+            type: DirectoryOrCreate
+        - name: flo-dir-tmp-volume
+          emptyDir: {}
+        - name: flo-dir-run-volume
+          emptyDir: {}
+        - name: fluentbit-storage
+          emptyDir: {}
+        {{- if and .Values.fluentbit_sidecar .Values.fluentbit_sidecar.enabled }}
+        - name: f5-log-pipes
+          emptyDir: {}
+        - name: f5-flo-fluentbit-config
+          configMap:
+            name: f5-flo-fluentbit-config
+        - name: tls-flofluentbitqkview-grpc-svr-volume
+          secret:
+            secretName: tls-flofluentbitqkview-grpc-svr-secret
+        {{- if and .Values.fluentbit_sidecar .Values.fluentbit_sidecar.fluentbit.tls.enabled }}
+        - name: tls-flofluentbit-tcp-clt-volume
+          secret:
+            secretName: tls-flofluentbit-tcp-clt-secret
+        {{- end }}
+        {{- end }}

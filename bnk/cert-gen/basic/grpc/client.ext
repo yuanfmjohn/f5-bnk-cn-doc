@@ -1,0 +1,7 @@
+[req_ext]
+
+subjectAltName = @alt_names
+
+[alt_names]
+
+email.1 = clientcert@f5net.com

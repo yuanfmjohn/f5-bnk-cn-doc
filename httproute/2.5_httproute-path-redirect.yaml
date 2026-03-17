@@ -1,0 +1,78 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: path-redirect-gw
+  namespace: web
+spec:
+  addresses:
+  - type: "IPAddress"
+    value: 192.168.48.202
+  gatewayClassName: f5-gateway-class
+  listeners:
+  - name: http-path-redirect
+    protocol: HTTP
+    port: 80
+    allowedRoutes:
+      namespaces:
+        from: "All"
+      kinds:
+      - kind: HTTPRoute
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-path-redirect
+  namespace: web
+spec:
+  parentRefs:
+  - name: path-redirect-gw
+    sectionName: http-path-redirect
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /latte
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /black
+        statusCode: 302
+  - backendRefs:
+    - name: httpbin
+      port: 8080
+---
+apiVersion: "k8s.f5net.com/v1"
+kind: F5BigCneIrule
+metadata:
+  name: irule-path-redirect
+  namespace: web
+spec:
+  iRule: >
+    when HTTP_REQUEST {
+      if { [HTTP::uri] starts_with "/latte" } {
+         set new_uri [string map {"/latte" "/black"} [HTTP::uri]]
+         HTTP::respond 302 Location "http://[getfield [HTTP::host] ":" 1]$new_uri"
+      } elseif { [HTTP::uri] starts_with "/coffee" } {
+         HTTP::respond 302 Location "http://[getfield [HTTP::host] ":" 1]/green/tea"
+        } else {}
+    }
+---
+apiVersion: "gateway.k8s.f5net.com/v1alpha1"
+kind: BNKNetPolicy
+metadata:
+  name: netpolicy-path-redirect
+  namespace: web
+spec:
+  extensionRefs:
+  - kind: F5BigCneIrule
+    name: irule-path-redirect
+    group: k8s.f5net.com
+  targetRefs:
+  - kind: Gateway
+    name: path-redirect-gw
+    group: gateway.networking.k8s.io
+    sectionName: http-path-redirect
+
+

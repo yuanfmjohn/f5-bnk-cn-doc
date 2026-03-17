@@ -1,0 +1,33 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gw-tls-passthrough
+  namespace: web
+spec:
+  addresses:
+  - type: "IPAddress"
+    value: 192.168.48.202
+  gatewayClassName: f5-gateway-class
+  listeners:
+  - name: https
+    protocol: TCP
+    port: 443
+    allowedRoutes:
+      kinds:
+      - kind: L4Route
+        group: gateway.k8s.f5net.com
+---
+apiVersion: gateway.k8s.f5net.com/v1
+kind: L4Route
+metadata:
+  name: l4route-tls-passthrough
+  namespace: web
+spec:
+  protocol: TCP
+  parentRefs:
+  - name: gw-tls-passthrough
+    sectionName: https
+  rules:
+  - backendRefs:
+    - name: ssl-nginx-svc
+      port: 443

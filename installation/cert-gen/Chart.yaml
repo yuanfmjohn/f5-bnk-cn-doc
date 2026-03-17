@@ -1,0 +1,6 @@
+apiVersion: v2
+name: f5-cert-gen
+type: application
+version: 0.9.3
+description: Helm chart for f5-cert-gen
+appVersion: "1.16.0"

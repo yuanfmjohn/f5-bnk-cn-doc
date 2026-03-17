@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: local-test-cert
+  namespace: sec-infra
+spec:
+  dnsNames:
+    - www.f5bnk.com
+  secretName: local-test-tls-cert
+  issuerRef:
+    name: f5-bnk-ca-cluster-issuer
+    kind: ClusterIssuer

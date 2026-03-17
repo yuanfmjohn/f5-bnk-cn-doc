@@ -1,0 +1,4 @@
+[req_ext]
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = f5-validation-svc.validate-webhook.svc

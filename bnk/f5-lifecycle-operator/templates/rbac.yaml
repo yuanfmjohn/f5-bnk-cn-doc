@@ -1,0 +1,443 @@
+{{- if  .Values.rbac.create }}
+# Cluster wide
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ template "f5-lifecycle-operator.fullname" . }}
+rules:
+# Component CRs
+- apiGroups:
+  - k8s.f5.com
+  resources:
+  - bnkmanifests
+  - otelcollectors
+  - f5ingresses
+  - f5tmms
+  - afms
+  - analyzers
+  - observers
+  - nodelabelers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - k8s.f5.com
+  resources:
+  - bnkgatewayclasses/finalizers
+  - bnkmanifests/finalizers
+  - otelcollectors/finalizers
+  - f5ingresses/finalizers
+  - f5tmms/finalizers
+  - afms/finalizers
+  - analyzers/finalizers
+  - observers/finalizers
+  - nodelabelers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - k8s.f5.com
+  resources:
+  - bnkgatewayclasses/status
+  - bnkmanifests/status
+  - otelcollectors/status
+  - f5ingresses/status
+  - f5tmms/status
+  - afms/status
+  - analyzers/status
+  - observers/status
+  - nodelabelers/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - k8s.f5.com
+  resources:
+  - bnkgatewayclasses
+  - bnkmanifests
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+# RBAC for component resource creation
+- apiGroups:
+  - rbac.authorization.k8s.io
+  resources:
+  - roles
+  - rolebindings
+  - clusterrolebindings
+  - clusterroles
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - apps
+  - extensions
+  resources:
+  - deployments
+  - statefulsets
+  - daemonsets
+  - replicasets
+  - deployments/scale
+  - ingresses
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - cert-manager.io
+  resources:
+  - certificates
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - cert-manager.io
+  resources:
+  - clusterissuers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - k8s.cni.cncf.io
+  resources:
+  - network-attachment-definitions
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - serviceaccounts
+  - services
+  - persistentvolumeclaims
+  - resourcequotas
+  - secrets
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - validatingwebhookconfigurations
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  - ippools
+  - pods
+  - pods/exec
+  - pods/log
+  - endpoints
+  - deployments/scale
+  - deployments
+  - services/finalizers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - crd.projectcalico.org
+  resources:
+  - configmaps
+  - ippools
+  - namespaces
+  - nodes
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - create
+  - update
+  - delete
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - pods/exec
+  verbs:
+  - create
+- apiGroups:
+  - metrics.k8s.io
+  resources:
+  - pods
+  - nodes
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - get
+  - patch
+  - update
+  - list
+  - watch
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - pods/status
+  verbs:
+  - get
+  - patch
+  - list
+  - watch
+  - update
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - deletecollection
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+  - update
+  - watch
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+# - apiGroups:
+#   - fic.f5.com
+#   resources:
+#   - ipamranges
+#   - ipams
+#   - ipamranges/status
+#   - ipams/status
+#   verbs:
+#   - create
+#   - delete
+#   - get
+#   - list
+#   - patch
+#   - update
+#   - watch
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - fic.f5.com
+  - dns.k8s.f5net.com
+  - dos.k8s.f5net.com
+  - gateway.k8s.f5net.com
+  - gateway.networking.k8s.io
+  - ingresstcp.k8s.f5net.com
+  - ingressudp.k8s.f5net.com
+  - k8s.f5net.com
+  resources:
+  - "*"
+  verbs:
+  - create
+  - update
+  - delete
+  - patch
+# CWC needs a cluster role with this stuff so we need to have
+# these rules so we can make a cluster role with it
+- apiGroups:
+  - fic.f5.com
+  - dns.k8s.f5net.com
+  - dos.k8s.f5net.com
+  - gateway.k8s.f5net.com
+  - gateway.networking.k8s.io
+  - ingresstcp.k8s.f5net.com
+  - ingressudp.k8s.f5net.com
+  - k8s.f5.com
+  - k8s.f5net.com
+  resources:
+  - "*"
+  verbs:
+  - get
+  - list
+  - watch
+# For OpenShift
+{{- if .Capabilities.APIVersions.Has "config.openshift.io/v1" }}
+- apiGroups:
+  - config.openshift.io
+  resources:
+  - networks
+  verbs:
+  - get
+{{- end }}
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    {{- include "f5-lifecycle-operator.labels" . | nindent 4 }}
+  name: {{ template "f5-lifecycle-operator.fullname" . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ template "f5-lifecycle-operator.fullname" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ template "f5-lifecycle-operator.serviceAccountName" . }}
+  namespace: {{ include "f5-lifecycle-operator.namespace" . }}
+
+---
+
+# F5-utils shared namespace rbac
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ template "f5-lifecycle-operator.fullname" . }}
+  namespace: f5-utils
+rules:
+# Component CRs
+- apiGroups:
+  - k8s.f5.com
+  resources:
+  - rabbitmqs
+  - fluentds
+  - dssms
+  - f5cnfcrdsn6lans
+  - f5certmanagers
+  - cwcs
+  - csrcs
+  - crdconversions
+  - coremonds
+  - rabbitmqs
+  - ipamcontrollers
+  - crdinstallers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - k8s.f5.com
+  resources:
+  - rabbitmqs/finalizers
+  - fluentds/finalizers
+  - dssms/finalizers
+  - f5cnfcrdsn6lans/finalizers
+  - f5certmanagers/finalizers
+  - cwcs/finalizers
+  - csrcs/finalizers
+  - crdconversions/finalizers
+  - coremonds/finalizers
+  - rabbitmqs/finalizers
+  - ipamcontrollers/finalizers
+  - crdinstallers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - k8s.f5.com
+  resources:
+  - rabbitmqs/status
+  - fluentds/status
+  - dssms/status
+  - f5cnfcrdsn6lans/status
+  - f5certmanagers/status
+  - cwcs/status
+  - csrcs/status
+  - crdconversions/status
+  - coremonds/status
+  - rabbitmqs/status
+  - ipamcontrollers/status
+  - crdinstallers/status
+  verbs:
+  - get
+  - patch
+  - update
+
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    {{- include "f5-lifecycle-operator.labels" . | nindent 4 }}
+  name: {{ template "f5-lifecycle-operator.fullname" . }}
+  namespace: f5-utils
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ template "f5-lifecycle-operator.fullname" . }}
+subjects:
+- kind: ServiceAccount
+  name: {{ template "f5-lifecycle-operator.serviceAccountName" . }}
+  namespace: {{ include "f5-lifecycle-operator.namespace" . }}
+
+{{- end }}

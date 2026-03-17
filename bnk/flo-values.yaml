@@ -1,0 +1,17 @@
+global:
+  imagePullSecrets:
+    - name: far-secret
+  certmgr:
+    clusterIssuer: f5-bnk-ca-cluster-issuer
+
+defaultCertificate:
+  enabled: false
+otel:
+  enabled: false
+
+image:
+  registry: repo.f5.com/images
+  name: f5-lifecycle-operator
+  pullPolicy: Always
+
+namespace: f5-utils

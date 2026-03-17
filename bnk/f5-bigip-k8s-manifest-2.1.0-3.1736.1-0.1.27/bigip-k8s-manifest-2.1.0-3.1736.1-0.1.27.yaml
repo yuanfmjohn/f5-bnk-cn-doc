@@ -1,0 +1,148 @@
+f5_helm_repo: oci://repo.f5.com
+f5_docker_repo: repo.f5.com
+releases:
+  - version: 2.1.0-3.1736.1-0.1.27
+    helm_charts:
+      - name: charts/cwc
+        version: 0.43.1-0.0.15
+      - name: utils/f5-cert-gen
+        version: 0.9.3
+      - name: charts/f5-cert-manager
+        version: 0.23.35-0.0.10
+      - name: charts/f5-crdconversion
+        version: 0.23.2-0.1.1
+      - name: charts/f5-dssm
+        version: 1.27.1-0.0.20
+      - name: charts/f5-cnf-crds-n6lan
+        version: 13.7.1-0.3.22
+      - name: charts/f5-spk-crds-common
+        version: 13.7.1-0.3.22
+      - name: charts/f5-spk-crds-deprecated
+        version: 13.7.1-0.3.22
+      - name: charts/f5-spk-crds-service-proxy
+        version: 13.7.1-0.3.22      
+      - name: charts/f5-toda-fluentd
+        version: 1.31.30-0.0.7
+      - name: charts/f5ingress
+        version: v13.7.1-0.3.22
+      - name: charts/rabbitmq
+        version: 0.6.1-0.0.13
+      - name: charts/csrc
+        version: 0.9.1-0.3.0
+      - name: charts/coremond
+        version: 0.7.56-0.0.5
+      - name: charts/f5-toda-observer
+        version: 5.7.5-0.1.0
+      - name: utils/log-doc-f5ingress
+        version: 13.7.1+0.3.22
+      - name: utils/dnat-util
+        version: v0.5.6 
+      - name: charts/f5-lifecycle-operator
+        version: v1.198.4-0.1.36  
+      - name: charts/f5-ipam-controller
+        version: v1.1.35-0.0.6  
+      - name: charts/node-labeler
+        version: 0.6.5-0.0.2
+      - name: charts/f5-license-proxy
+        version: 1.29.0-0.10.12
+      - name: utils/flp-setup
+        version: 1.29.0-0.10.12
+    docker_images:
+      - name: images/cert-manager-cainjector
+        version: v2.3.0
+      - name: images/cert-manager-controller
+        version: v2.3.0
+      - name: images/cert-manager-startupapicheck
+        version: v2.3.0
+      - name: images/cert-manager-webhook
+        version: v2.3.0
+      - name: images/crd-conversion
+        version: v1.69.3-0.0.5
+      - name: images/crdupdater
+        version: v0.4.32-0.0.2
+      - name: images/f5-blobd
+        version: v1.23.1-0.0.5
+      - name: images/f5-cert-client
+        version: v3.1.2-0.0.3
+      - name: images/f5-csm-qkview
+        version: v0.10.37-0.0.4
+      - name: images/f5-debug-sidecar
+        version: v10.5.0-0.1.32
+      - name: images/f5-downloader
+        version: v0.27.9-0.0.12
+      - name: images/f5-dssm-store
+        version: v5.1.7-0.0.3
+      - name: images/f5-dssm-upgrader
+        version: v2.0.17-0.0.3
+      - name: images/f5-fluentbit
+        version: v1.2.8-0.0.5
+      - name: images/f5-fluentd
+        version: v2.0.11-0.0.11
+      - name: images/f5-l4p-engine
+        version: v1.127.13-0.0.5
+      - name: images/f5-license-helper
+        version: v0.12.10-0.0.4
+      - name: images/f5-nsec-ips-daemon
+        version: v3.5.1-0.0.4
+      - name: images/f5-toda-tmstatsd
+        version: v1.11.19-0.0.3
+      - name: images/f5dr-img
+        version: v3.2.14-0.0.4
+      - name: images/f5dr-img-init
+        version: v3.2.14-0.0.4
+      - name: images/f5ing-tmm-pod-manager
+        version: v1.0.18-0.0.7
+      - name: images/f5ingress
+        version: v13.7.1-0.3.22
+      - name: images/init-certmgr
+        version: v0.23.35-0.0.10
+      - name: images/opentelemetry-collector-contrib
+        version: 0.123.0
+      - name: images/rabbit
+        version: v0.5.9-0.0.11
+      - name: images/spk-cwc
+        version: v0.35.0-0.0.5
+      - name: images/tmm-img
+        version: v10.50.7-0.2.9
+      - name: images/tmrouted-img
+        version: v2.3.0-0.0.3
+      - name: images/spk-csrc
+        version: v0.6.1-0.0.5
+      - name: images/f5-dwbld
+        version: v1.161.0-0.2.11
+      - name: images/f5-coremond
+        version: v0.7.56-0.0.5
+      - name: images/f5-toda-observer
+        version: v5.7.5-0.1.0
+      - name: images/f5-bdosd
+        version: v0.72.0-0.1.3
+      - name: images/dnsx-img
+        version: v0.10.21-0.0.4
+      - name: images/f5-lifecycle-operator
+        version: v1.198.4-0.1.36  
+      - name: images/f5-ipam-controller
+        version: v1.1.35-0.0.6
+      - name: images/f5-node-labeler
+        version: v0.0.15-0.0.2
+      - name: images/f5-eowyn-install
+        version: v0.5.4
+      - name: images/crd-installer
+        version: v13.7.1-0.3.22  
+      - name: images/postgresql
+        version: 17.5.0
+      - name: images/vault
+        version: 1.20.1
+      - name: images/vault-init
+        version: 1.29.0-0.10.12
+      - name: images/f5-license-proxy
+        version: 1.29.0-0.10.12
+      - name: images/f5-env-discovery
+        version: v1.198.4-0.1.36  
+      - name: images/f5-fqdn-resolver
+        version: v0.8.1-0.0.3  
+      - name: images/gslb-engine
+        version: v0.111.15-0.0.2  
+      - name: images/gslb-probe-agent
+        version: v0.31.4-0.0.2
+      - name: images/f5-analyzer
+        version: v0.0.3-0.0.5  

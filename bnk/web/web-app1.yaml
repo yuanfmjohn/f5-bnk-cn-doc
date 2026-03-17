@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-web
+  # deployment is namespace independent. Include namespace-specific config in nginx-conf-cm
+  labels:
+    app: nginx-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-web
+  template:
+    metadata:
+      labels:
+        app: nginx-web
+    spec:
+      containers:
+      - name: nginx-web
+        image: nginx:latest
+        ports:
+        - containerPort: 8080
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - mountPath: /etc/nginx/nginx.conf
+            name: nginx-web-conf-volume
+            readOnly: true
+            subPath: nginx.conf
+      - name: netshoot
+        image: nicolaka/netshoot:latest
+        command: [ "sleep", "infinity" ] # Keeps the container running
+        imagePullPolicy: IfNotPresent
+        # Optional: Add resources or limits if needed
+        volumeMounts:
+        - name: netshoot-web-conf-volume
+          mountPath: /root/.curlrc
+          subPath: .curlrc
+      volumes:
+        - name: nginx-web-conf-volume
+          configMap:
+            name: nginx-web-conf-cm
+        - name: netshoot-web-conf-volume
+          configMap:
+            name: netshoot-web-conf-cm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-nginx-svc
+spec:
+  clusterIP: None
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: nginx-web
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: netshoot-web-conf-cm
+data:
+  .curlrc: |
+    # custom CURL options
+    --location
+    --silent
+    --insecure
+    --max-time 1
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations: {}
+  name: nginx-web-conf-cm
+data:
+  nginx.conf: |
+    user nginx;
+    worker_processes  1;
+    events {
+      worker_connections 10240;
+    }
+    http {
+      server {
+        listen 8080;
+        add_header Access-Control-Allow-Origin *;
+        location / {
+          default_type text/plain;
+          return 200 "Web AT web.inf.ai $server_name\n$remote_addr:$remote_port-->$server_addr:$server_port\n";
+        }
+      }
+    }

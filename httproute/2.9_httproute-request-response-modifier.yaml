@@ -1,0 +1,124 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: modifier-gw
+  namespace: web
+spec:
+  addresses:
+  - type: "IPAddress"
+    value: 192.168.48.202
+  gatewayClassName: f5-gateway-class
+  listeners:
+  - name: http-modifier
+    protocol: HTTP
+    port: 80
+    allowedRoutes:
+      namespaces:
+        from: "All"
+      kinds:
+      - kind: HTTPRoute
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-modifier
+  namespace: web
+spec:
+  parentRefs:
+  - name: modifier-gw
+    sectionName: http-modifier
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /headers
+    filters:
+    - type: RequestHeaderModifier
+      requestHeaderModifier:
+        add:
+        - name: Host
+          value: new.f5bnk.com
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /coffee
+    filters:
+    - type: RequestHeaderModifier
+      requestHeaderModifier:
+        set:
+        - name: User-Agent
+          value: Chrome
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /tea
+    filters:
+    - type: RequestHeaderModifier
+      requestHeaderModifier:
+        remove: ["X-tea-id"]
+  - filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        add:
+        - name: X-XSS-Protection
+          value: "1; mode=block"
+  - filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        set:
+        - name: X-Frame-Options
+          value: DIFFERENT
+  - filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        remove: ["X-Content-Type-Options"]
+  - backendRefs:
+    - name: web-nginx-modifier-svc
+      port: 80
+---
+apiVersion: "k8s.f5net.com/v1"
+kind: F5BigCneIrule
+metadata:
+  name: irule-modifier
+  namespace: web
+spec:
+  iRule: >
+    when HTTP_REQUEST {
+      if { [HTTP::uri] starts_with "/headers" } {
+         HTTP::header replace "User-Agent" "Modified-Chrome"
+      } elseif { [HTTP::uri] starts_with "/coffee" } {
+                 HTTP::header remove "X-tea-id"
+        } else {
+               HTTP::header insert "Host" "new.f5bnk.com"
+          }
+    }
+
+    when HTTP_RESPONSE {
+      if { [HTTP::header exists "X-Frame-Options"] } {
+         HTTP::header replace "X-Frame-Options" "DIFFERENT"
+      }
+      if { [HTTP::header exists "X-Content-Type-Options"] } {
+         HTTP::header remove "X-Content-Type-Options"
+      }
+      if { !([HTTP::header exists "X-XSS-Protection"]) } {
+         HTTP::header insert "X-XSS-Protection" "1; mode=block"
+          }
+    }
+---
+apiVersion: "gateway.k8s.f5net.com/v1alpha1"
+kind: BNKNetPolicy
+metadata:
+  name: netpolicy-modifier
+  namespace: web
+spec:
+  extensionRefs:
+  - kind: F5BigCneIrule
+    name: irule-modifier
+    group: k8s.f5net.com
+  targetRefs:
+  - kind: Gateway
+    name: modifier-gw
+    group: gateway.networking.k8s.io
+    sectionName: http-modifier
+
+

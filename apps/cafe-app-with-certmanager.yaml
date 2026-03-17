@@ -1,0 +1,84 @@
+# cert-manager를 사용한 자동 TLS 인증서 관리 (프로덕션 권장)
+
+# ClusterIssuer - Let's Encrypt 사용
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    # Let's Encrypt 프로덕션 서버
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: your-email@example.com  # 본인 이메일로 변경
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+---
+# ClusterIssuer - Let's Encrypt Staging (테스트용)
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    # Let's Encrypt 스테이징 서버 (테스트용, 속도 제한 없음)
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: your-email@example.com  # 본인 이메일로 변경
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+---
+# Ingress with cert-manager annotations
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cafe-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # cert-manager가 자동으로 인증서 발급
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # 또는 테스트 시: cert-manager.io/cluster-issuer: "letsencrypt-staging"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - cafe.example.com  # 실제 도메인으로 변경 필요
+    secretName: cafe-tls-cert  # cert-manager가 자동 생성
+  rules:
+  - host: cafe.example.com  # 실제 도메인으로 변경 필요
+    http:
+      paths:
+      - path: /coffee
+        pathType: Prefix
+        backend:
+          service:
+            name: coffee-svc
+            port:
+              number: 80
+      - path: /tea
+        pathType: Prefix
+        backend:
+          service:
+            name: tea-svc
+            port:
+              number: 80
+
+---
+# 사용 방법:
+# 1. cert-manager 설치
+#    kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
+#
+# 2. ClusterIssuer 적용
+#    kubectl apply -f cafe-app-with-certmanager.yaml
+#
+# 3. 인증서 발급 확인
+#    kubectl get certificate
+#    kubectl describe certificate cafe-tls-cert
+#
+# 4. 인증서 갱신은 cert-manager가 자동으로 처리 (만료 30일 전)

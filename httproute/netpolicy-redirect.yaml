@@ -1,0 +1,15 @@
+apiVersion: "gateway.k8s.f5net.com/v1alpha1"
+kind: BNKNetPolicy
+metadata:
+  name: netpolicy-redirect
+  namespace: web
+spec:
+  extensionRefs:
+  - group: k8s.f5net.com
+    kind: F5BigCneIrule
+    name: irule-redirect
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: redirect-gateway
+    sectionName: "http"

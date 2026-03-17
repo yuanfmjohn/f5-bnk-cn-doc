@@ -1,0 +1,9 @@
+apiVersion: "k8s.f5net.com/v1"
+kind: F5SPKStaticRoute
+metadata:
+  name: ext-route
+spec:
+  destination: 0.0.0.0
+  prefixLen: 0 
+  type: gateway
+  gateway: 192.168.48.1 

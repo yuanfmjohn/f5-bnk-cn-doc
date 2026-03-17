@@ -1,0 +1,49 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: tls-https-gw
+  namespace: web
+spec:
+  infrastructure:
+    parametersRefs:
+      group: k8s.f5net.com
+      kind: F5BnKGateway
+      name: f5-bnkgateway
+  addresses:
+  - type: "IPAddress"
+    value: 192.168.48.201
+  gatewayClassName: f5-gateway-class
+  listeners:
+  - name: https
+    protocol: HTTP
+    port: 443
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: tls-secret
+        namespace: f5-bnk
+    allowedRoutes:
+      namespaces:
+        from: "All"
+      kinds:
+      - kind: HTTPRoute
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: https
+  namespace: web 
+spec:
+  parentRefs:
+  - name: tls-https-gw
+    sectionName: https
+  rules:
+  - matches:
+    - headers:
+      - name: "Host"
+        value: "web.inf.ai"
+    backendRefs:
+    - name: web-nginx-svc
+      namespace: web 
+      port: 80

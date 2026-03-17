@@ -1,0 +1,1000 @@
+ 1000  k get crd
+ 1001  k apply -f tmm-spk-vlan.yaml -n f5-bnk
+ 1002  k get pods -A
+ 1003  vi bnkgatewayclass-cr.yaml
+ 1004  k delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1005  k apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1006  k get pods -A
+ 1007  k delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1008  vi bnkgatewayclass-cr.yaml
+ 1009  k apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1010  k get pods -A
+ 1011  vi bnkgatewayclass-cr.yaml
+ 1012  vi manifest.yaml
+ 1013  k apply -f manifest.yaml 
+ 1014  k apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1015  k get pods -A
+ 1016  k delete -f manifest.yaml 
+ 1017  k delete -f bnkgatewayclass-cr.yaml
+ 1018  ll
+ 1019  cd bnk
+ 1020  ll
+ 1021  k get pod -A
+ 1022  vi bnkgatewayclass-cr.yaml
+ 1023  ll
+ 1024  helm pull oci://repo.f5.com/release/f5-bigip-k8s-manifest --version 2.1.0-3.1736.1-0.1.27
+ 1025  tar zxvf f5-bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27.tgz 
+ 1026  ll
+ 1027  k delete -f bnkgatewayclass-cr.yaml
+ 1028  k apply -f bnkgatewayclass-cr.yaml
+ 1029  k get pods -A
+ 1030  k delete -f bnkgatewayclass-cr.yaml
+ 1031  cat cne_pull_64.json | helm registry login -u _json_key_base64 --password-stdin https://repo.f5.com
+ 1032  cat cne_pull_64.json | helm registry login -u _json_key_base64 --password-stdin repo.f5.com
+ 1033  helm pull oci://repo.f5.com/utils/f5-cert-gen --version 0.9.3
+ 1034  tar zxvf f5-cert-gen-0.9.3.tgz
+ 1035  k get ns
+ 1036  sh cert-gen/gen_cert.sh -s=api-server -a=f5-spk-cwc.f5-utils -n=1
+ 1037  k apply -f cwc-license-certs.yaml -n f5-utils
+ 1038  helm pull oci://repo.f5.com/charts/f5-lifecycle-operator   --version v1.198.4-0.1.36
+ 1039  helm pull oci://repo.f5.com/utils/f5-cert-gen   --version 0.9.3
+ 1040  cat cne_pull_64.json | docker login -u _json_key_base64 --password-stdin repo.f5.com
+ 1041  docker pull repo.f5.com/images/rabbit:v0.5.9-0.0.11
+ 1042  vi cwc-license-certs.yaml 
+ 1043  k get secret -A
+ 1044  k delete -f bnkgatewayclass-cr.yaml
+ 1045  k apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1046  k get pods -A
+ 1047  k get bnkgatewayclass
+ 1048  k get bnkgatewayclass -n f5-bnk
+ 1049  k describe bnkgatewayclass -n f5-bnk
+ 1050  k logs bnkgatewayclass -n f5-bnk
+ 1051  k get pods -A
+ 1052  ll
+ 1053  cd f5-bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27/
+ 1054  ll
+ 1055  vi bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27.yaml 
+ 1056  cd ..
+ 1057  k delete -f bnkgatewayclass-cr.yaml
+ 1058  k delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1059  vi bnkgatewayclass-cr.yaml
+ 1060  k apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1061  k get pods -A
+ 1062  k logs -f flo-f5-lifecycle-operator-fc86765b7-r7kpp -n f5-bnk
+ 1063  k get pods -A
+ 1064  k logs -f flo-f5-lifecycle-operator-fc86765b7-kb7ct -n f5-utils
+ 1065  k describe f5-tmm-c4dx6 -n f5-bnk
+ 1066  k describe pod f5-tmm-c4dx6 -n f5-bnk
+ 1067  kubectl get secret -n f5-bnk | egrep 'tls-|cert|issuer|ca' || true
+ 1068  kubectl get secret -n f5-utils | egrep 'tls-|cert|issuer|ca' || true
+ 1069  kubectl get certificate,certificaterequest -A | egrep 'f5-|bnk|tmm|observer|blobd|debug|grpc|mds|qkview' || true
+ 1070  kubectl get challenge,order -A | head -n 200
+ 1071  kubectl describe pod f5-tmm-c4dx6 -n f5-bnk | sed -n '/Volumes:/,/QoS Class:/p'
+ 1072  kubectl logs -n f5-bnk f5-tmm-c4dx6 -c f5-tmm --previous --tail=200
+ 1073  kubectl logs -n f5-bnk f5-tmm-c4dx6 -c f5-tmm --tail=200
+ 1074  kubectl logs -n f5-bnk f5-tmm-c4dx6 -c f5-tmm-routing --previous --tail=200
+ 1075  kubectl logs -n f5-bnk f5-tmm-c4dx6 -c f5-tmm-routing --tail=200
+ 1076  k get csrc -A
+ 1077  cd bnk
+ 1078  k delete -f bnkgatewayclass-cr.yaml
+ 1079  vi bnkgatewayclass-cr.yaml
+ 1080  k apply -f sriov-sf-internal.yaml 
+ 1081  k get network-attachment-definition -A
+ 1082  k apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1083  kubectl get secrets licensestatus -n f5-utils -o jsonpath={'.data.licensestatus'} | base64 -d | jq
+ 1084  vi cwc-license-certs.yaml 
+ 1085  mkdir -p $HOME/cwc/cwc_api
+ 1086  cd ..
+ 1087  ll
+ 1088  cp api-server-secrets/ssl/client/certs/client_certificate.pem $HOME/cwc/cwc_api
+ 1089  ll
+ 1090  k delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1091  cd bnk
+ 1092  k delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1093  vi bnkgatewayclass-cr.yaml
+ 1094  k delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1095  vi bnkgatewayclass-cr.yaml
+ 1096  k apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1097  k describe pod f5-node-labeler-vvfpr -n f5-bnk
+ 1098  k delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1099  vi sriov-sf-internal.yaml 
+ 1100  k apply sriov-sf-internal.yaml 
+ 1101  k apply -f sriov-sf-internal.yaml 
+ 1102  k apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1103  k get pods f5-tmm-g6bgx -n f5-bnk
+ 1104  k logs -f f5-tmm-g6bgx -n f5-bnk
+ 1105  k logs -f f5-node-labeler-drdcd -n f5-bnk
+ 1106  k describe pod f5-node-labeler-drdcd -n f5-bnk
+ 1107  kubectl -n f5-bnk get ds f5-node-labeler -o yaml | sed -n '1,220p'
+ 1108  kubectl -n f5-bnk get events --sort-by=.lastTimestamp | tail -n 30
+ 1109  kubectl -n f5-bnk get bnkgatewayclass f5-bnk-f5-cne-controller -o yaml
+ 1110  ll
+ 1111  cd f5-bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27/
+ 1112  ll
+ 1113  cat bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27.yaml 
+ 1114  cat bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27.yaml  | grep label
+ 1115  vi Chart.yaml 
+ 1116  vi bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27.yaml 
+ 1117  cd ..
+ 1118  k delete -f bnkgatewayclass-cr.yaml
+ 1119  k delete -f f5-bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27/bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27.yaml 
+ 1120  cd f5-bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27/
+ 1121  k apply -f Chart.yaml 
+ 1122  k apply -f bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27.yaml 
+ 1123  ll
+ 1124  cp bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27.yaml bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27.yaml.bak
+ 1125  vi bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27.yaml
+ 1126  cd ..
+ 1127  ll
+ 1128  k apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1129  k describe pod f5-node-labeler-d9jjk -n f5-bnk
+ 1130  cd f5-bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27/
+ 1131  rm -rf bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27.yaml
+ 1132  mv bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27.yaml.bak bigip-k8s-manifest-2.1.0-3.1736.1-0.1.27.yaml
+ 1133  cd ..
+ 1134  k describe pod f5-node-labeler-d9jjk -n f5-bnk
+ 1135  ll
+ 1136  cd ..
+ 1137  ll
+ 1138  cd bnk
+ 1139  k delete -f bnkgatewayclass-cr.yaml 
+ 1140  k delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1141  ll
+ 1142  cd bnk
+ 1143  k delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1144  k apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1145  k delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1146  vi bnkgatewayclass-cr.yaml
+ 1147  k get networkattachment
+ 1148  vi bnkgatewayclass-cr.yaml
+ 1149  kubectl get network-attachment-definitions -A
+ 1150  ll
+ 1151  vi sriov-sf-external.yaml 
+ 1152  vi bnkgatewayclass-cr.yaml
+ 1153  k delete -f sriov-sf-external.yaml 
+ 1154  k delete -f sriov-sf-internal.yaml 
+ 1155  k apply -f sriov-sf-external.yaml 
+ 1156  kubectl get network-attachment-definitions -A
+ 1157  k delete network-attachment-definitions sf-external -n default
+ 1158  k apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1159  k get pods -A
+ 1160  k delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1161  vi flo-values.yaml
+ 1162  k delete -n f5-bnk flo
+ 1163  helm delete -n f5-bnk flo
+ 1164  k get pods -A
+ 1165  helm install flo ./f5-lifecycle-operator -n f5-utils -f flo-values.yaml
+ 1166  vi flo-values.yaml
+ 1167  k get crd
+ 1168  k get crd | grep k8s.f5.com
+ 1169  kubectl get crd | awk '/k8s.f5.com/ {print $1}' | xargs kubectl delete crd
+ 1170  helm install flo ./f5-lifecycle-operator -n f5-utils -f flo-values.yaml
+ 1171  k get crd | grep k8s.f5.com
+ 1172  k get crd | grep k8s.f5.com | wc -l
+ 1173  k apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1174  watch -n 1 'k get pods -A'
+ 1175  watch -n 1 'kubectl get pods -A'
+ 1176  k get pods -A
+ 1177  kubectl describe bnkgatewayclass f5-bnk-f5-cne-controller -n f5-bnk
+ 1178  kubectl get node -o custom-columns=NAME:.metadata.name,HUGEPAGE:.status.allocatable.hugepages-1Gi
+ 1179  kubectl get network-attachment-definitions -A
+ 1180  kubectl get node -o json | jq '.items[].status.allocatable'
+ 1181  grep HugePages /proc/meminfo
+ 1182  kubectl get node -o custom-columns=NAME:.metadata.name,HUGEPAGE:.status.allocatable.hugepages-1Gi
+ 1183  NAME       HUGEPAGE
+ 1184  master     0
+ 1185  worker01   0
+ 1186  worker02   0
+ 1187  kubectl get node -o custom-columns=NAME:.metadata.name,HUGEPAGE:.status.allocatable.hugepages-1Gi
+ 1188  kubectl describe bnkgatewayclass f5-bnk-f5-cne-controller -n f5-bnk
+ 1189  kubectl get node -o custom-columns=NAME:.metadata.name,HUGEPAGE:.status.allocatable.hugepages-1Gi
+ 1190  k get nodes -A
+ 1191  k get nodes
+ 1192  kubectl get node -o custom-columns=NAME:.metadata.name,HUGEPAGE:.status.allocatable.hugepages-1Gi
+ 1193  kubectl get node -o custom-columns=NAME:.metadata.name,HUGEPAGE:.status.allocatable.hugepages
+ 1194  kubectl get node -o custom-columns=NAME:.metadata.name,HUGEPAGE:.status.allocatable
+ 1195  kubectl get node -o custom-columns=NAME:.metadata.name,HUGEPAGE:.status.allocatable.hugepages-1Gi
+ 1196  k get pods -
+ 1197  k get pods -A
+ 1198  k delete -f bnkgatewayclass-cr.yaml
+ 1199  k get pods -A
+ 1200  kubectl get crd gatewayclasses.gateway.networking.k8s.io -o yaml | grep -A5 versions:
+ 1201  kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/experimental-install.yaml
+ 1202  kubectl delete crd backendtlspolicies.gateway.networking.k8s.io gatewayclasses.gateway.networking.k8s.io gateways.gateway.networking.k8s.io httproutes.gateway.networking.k8s.io grpcroutes.gateway.networking.k8s.io tcproutes.gateway.networking.k8s.io tlsroutes.gateway.networking.k8s.io udproutes.gateway.networking.k8s.io referencegrants.gateway.networking.k8s.io
+ 1203  kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/experimental-install.yaml
+ 1204  kubectl get crd gatewayclasses.gateway.networking.k8s.io -o yaml | grep -A5 versions:
+ 1205  k get pods -A
+ 1206  k apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1207  k get pods -A
+ 1208  k get pods -A | grep f5
+ 1209  watch -n 1 'kubectl get pods -A | grep f5'
+ 1210  ip add
+ 1211  dd
+ 1212  ll
+ 1213  k get pods -A
+ 1214  ll
+ 1215  ip addr
+ 1216  lspci
+ 1217  lspci | grep -i ether
+ 1218  iplink show
+ 1219  ip link show
+ 1220  ip link up eno 2
+ 1221  ip link eno2 up
+ 1222  ip link set dev eno2 up
+ 1223  ip link show
+ 1224  ip add
+ 1225  vi /etc/netplan/50-cloud-init.yaml 
+ 1226  netplan apply
+ 1227  vi /etc/netplan/50-cloud-init.yaml 
+ 1228  netplan apply
+ 1229  ping 192.168.46.1
+ 1230  ip link show
+ 1231  vi /etc/netplan/50-cloud-init.yaml 
+ 1232  ip link show
+ 1233  k get pods -A
+ 1234  cd bnk
+ 1235  vi bnkgatewayclass-cr.yaml
+ 1236  k apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1237  k get pods -A
+ 1238  k get pods -A | grep f5
+ 1239  k describe pod f5-node-labeler-bnqc2 -n f5-bnk
+ 1240  vi bnkgatewayclass-cr.yaml
+ 1241  k get pods -A
+ 1242  k delete -f bnkgatewayclass-cr.yaml
+ 1243  k get pods -A
+ 1244  vi sriov-sf-internal.yaml 
+ 1245  cp sriov-sf-external.yaml sriov-sf-external.yaml.bak
+ 1246  vi sriov-sf-internal.yaml sriov-sf-external.yaml
+ 1247  cp sriov-sf-internal.yaml sriov-sf-external.yaml
+ 1248  vi sriov-sf-internal.yaml
+ 1249  vi macvlan-sf.yaml
+ 1250  k get pods -A
+ 1251  vi /etc/netplan/50-cloud-init.yaml 
+ 1252  k get pods -A
+ 1253  ls -al 
+ 1254  cat spk-eval.jwt
+ 1255  ll
+ 1256  vi net-macvlan.yaml
+ 1257  vi sriov-sf-external.yaml
+ 1258  vi macvlan.yaml
+ 1259  ip link
+ 1260  vi macvlan.yaml
+ 1261  k delete -f bnkgatewayclass-cr.yaml
+ 1262  k delete -f sriov-sf-external.yaml
+ 1263  k delete -f sriov-sf-internal.yaml
+ 1264  k apply -f macvlan.yaml 
+ 1265  vi bnkgatewayclass-cr.yaml
+ 1266  k apply -f bnkgatewayclass-cr.yaml
+ 1267  k get pods -A
+ 1268  k describe pod f5-node-labeler-7rpk5 -n f5-bnk
+ 1269  vi tmm-spk-vlan.yaml 
+ 1270  vi bnkgatewayclass-cr.yaml
+ 1271  vi macvlan.yaml 
+ 1272  k get network-attachment-defenition
+ 1273  k get network-attachments-defenition 
+ 1274  k get network-attachment-definition
+ 1275  k get network-attachment-definition -A
+ 1276  k delete network-attachment-definition -f5 bnk sf-external
+ 1277  k delete network-attachment-definition --n f5-bnk sf-external
+ 1278  k delete network-attachment-definition -n f5-bnk sf-external
+ 1279  k delete network-attachment-definition -f5 bnk sf-internal
+ 1280  k delete network-attachment-definition -n f5-bnk sf-internal
+ 1281  k apply -f macvlan.yaml 
+ 1282  k get network-attachment-definition -A
+ 1283  k delete -f bnkgatewayclass-cr.yaml 
+ 1284  k get network-attachment-definition -A
+ 1285  k describe network-attachment-definition sf-external
+ 1286  k describe network-attachment-definition sf-external -n f5-bnk
+ 1287  k describe network-attachment-definition sf-internal -n f5-bnk
+ 1288  k get pods -A
+ 1289  vi bnkgatewayclass-cr.yaml
+ 1290  k get network-attachment-definition -A
+ 1291  k delete network-attachment-definition -n f5-bnk sf-internal 
+ 1292  k get network-attachment-definition -A
+ 1293  vi macvlan.yaml 
+ 1294  k apply -f macvlan.yaml 
+ 1295  vi macvlan.yaml 
+ 1296  ls
+ 1297  cat flo-values.yaml
+ 1298  cat spk-eval.jwt 
+ 1299  cat flo-values.yaml.bak2 
+ 1300  ll
+ 1301  cat flo-values.yaml.bak2 
+ 1302  k get pods -A
+ 1303  vi flo-values.yaml
+ 1304  who
+ 1305  vi macvlan.yaml 
+ 1306  cat flo-values-new.yaml 
+ 1307  cat spk-eval.jwt 
+ 1308  vi flo-values-new.yaml 
+ 1309  k delete -f bnkgatewayclass-cr.yaml
+ 1310  helm delete flo -n f5-bnk
+ 1311  helm list -A
+ 1312  helm delete flo -n f5-utils
+ 1313  history  | grep helm install
+ 1314  history  | grep 'helm'
+ 1315  helm install flo ./f5-lifecycle-operator -n f5-utils -f flo-values.yaml
+ 1316  helm install flo ./f5-lifecycle-operator -n f5-bnk -f flo-values-new.yaml
+ 1317  kubectl get crd | awk '/k8s.f5.com/ {print $1}' | xargs kubectl delete crd
+ 1318  helm install flo ./f5-lifecycle-operator -n f5-bnk -f flo-values-new.yaml
+ 1319  vi flo-values-new.yaml 
+ 1320  k get configmap -A
+ 1321  helm install flo ./f5-lifecycle-operator -n f5-bnk -f flo-values-new.yaml
+ 1322  k get configmap -A
+ 1323  helm install flo ./f5-lifecycle-operator -n f5-bnk -f flo-values-new.yaml
+ 1324  k get pods -A
+ 1325  ls
+ 1326  cd bnk
+ 1327  ls
+ 1328  kubectl get po 
+ 1329  ls
+ 1330  cat spk-vlan.yaml 
+ 1331  exec -it deploy/f5-tmm -n f5-bnk -- ip addr
+ 1332  exec -it deploy/f5-tmm -c tmm_debug -n f5-bnk -- ip addr
+ 1333  k getpo 
+ 1334  kubectl get node -o wide
+ 1335  kubectl get namespace
+ 1336  kubectl get pod -n f5-bnk
+ 1337  kubrectl get pod -n f5-utils
+ 1338  kubectl get pod -n f5-utils
+ 1339  ls
+ 1340  cd bnk
+ 1341  ls
+ 1342  less sriov-sf-external.yaml 
+ 1343  less sriov-sf-internal.yaml 
+ 1344  less sriov-sf-external.yaml 
+ 1345  less bnkgatewayclass-cr.yaml
+ 1346  less flo-values.yaml
+ 1347  less flo-values.yaml.bak2 
+ 1348  mount -a
+ 1349  mount 
+ 1350  ip a
+ 1351  kubectl get clussterissuer
+ 1352  kubectl get csi
+ 1353  kubectl get pv
+ 1354  kubectl get pvkubectl get pod -n f5-bnk
+ 1355  kubectl get pod -n f5-bnk
+ 1356  kubectl get pod -n f5-utils
+ 1357  kubectl logs f5-cne-controller-c9d5b88c6-vnsnk -n f5-bnk | less
+ 1358  kubectl get network-attach-def
+ 1359  kubectl get net-attach-def -A
+ 1360  kubectl get net-attach-def -A -o yaml | less
+ 1361  kubectl get clusterissuer -A
+ 1362  ls
+ 1363  less sriov-sf-external.yaml
+ 1364  ls
+ 1365  cp flo-values.yaml flo-values-new.yaml
+ 1366  vi flo-values-new.yaml 
+ 1367  helm list -A
+ 1368  less flo-values-new.yaml 
+ 1369  kubectl get secret -n f5-utils
+ 1370  kubectl get cm -n f5-utils
+ 1371  kubectl delete cm cpcl-config-cm -n f5-utils
+ 1372  kubectl delete cm cpcl-key-cm -n f5-utils
+ 1373  kubectl delete cm cwc-qkview-cm -n f5-utils
+ 1374  kubectl get cm -n f5-bnk
+ 1375  kubectl get secret -n f5-bnk
+ 1376  kubectl get pod -n f5-bnk
+ 1377  kubectl logs flo-f5-lifecycle-operator-fc86765b7-p8wmz -n f5-bnk | less
+ 1378  less flo-values-new.yaml 
+ 1379  kubectl get secret -n f5-utils
+ 1380  kubectl get cm -n f5-utils
+ 1381  kubectl get cm -n f5-utils cpcl-config-cm -oyaml
+ 1382  kubectl get cm -n f5-utils cpcl-key-cm -oyaml
+ 1383  kubectl logs flo-f5-lifecycle-operator-fc86765b7-p8wmz -n f5-bnk | less
+ 1384  kubectl get pod -n f5-utils
+ 1385  kubectl get pod -n f5-bnk
+ 1386  kubectl describe pod f5-tmm-6v2j9 -n f5-bnk | less
+ 1387  kubectl get pod -n f5-bnk
+ 1388  kubectl describe pod f5-tmm-6v2j9 -n f5-bnk | less
+ 1389  kubectl logs f5-tmm-6v2j9 -n f5-bnk | less
+ 1390  kubectl get secrets licensestatus -n f5-utils -o jsonpath={'.data.licensestatus'} | base64 -d | jq
+ 1391  kubectl get pod -n f5-utils
+ 1392  kubectl logs f5-spk-cwc-768df65898-mkxrn -n f5-utils | less
+ 1393  kubectl get pod -n f5-bnk
+ 1394  ls
+ 1395  kubectl logs f5-cne-controller-c9d5b88c6-8qz8d -n f5-bnk | less
+ 1396  kubectl logs flo-f5-lifecycle-operator-fc86765b7-p8wmz -n f5-bnk | less
+ 1397  less flo-values-new.yaml 
+ 1398  history | grep flo
+ 1399  less bnkgatewayclass-cr.yaml
+ 1400  vi bnkgatewayclass-cr.yaml
+ 1401  less flo-values-new.yaml 
+ 1402  ls
+ 1403  kubectl delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1404  kubectl get pod -n f5-bnk
+ 1405  kubectl get cm -n f5-utils
+ 1406  kubectl get secret -n f5-utils
+ 1407  helm list -n f5-bnk
+ 1408  helm uninstall flo -n f5-bnk
+ 1409  vi del_lic.sh
+ 1410  chmod 700 del_lic.sh 
+ 1411  ./del_lic.sh 
+ 1412  kubectl get cm -n f5-utils
+ 1413  vi flo-values-new.yaml 
+ 1414  helm install flo oci://repo.f5.com/charts/f5-lifecycle-operator --version v1.198.4-0.1.36 -f flo-values-new.yaml -n f5-bnk
+ 1415  kubectl get pod -n f5-bnk
+ 1416  kubectl logs flo-f5-lifecycle-operator-fc86765b7-lhnwv -n f5-bnk
+ 1417  ls
+ 1418  vi bnkgatewayclass-cr.yaml
+ 1419  kubectl apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1420  vi bnkgatewayclass-cr.yaml
+ 1421  kubectl apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1422  vi bnkgatewayclass-cr.yaml
+ 1423  kubectl apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1424  kubect get pod -n f5-bnk
+ 1425  kubectl get pod -n f5-bnk
+ 1426  watch kubectl get pod -n f5-bnk
+ 1427  kubectl get secrets licensestatus -n f5-utils -o jsonpath={'.data.licensestatus'} | base64 -d | jq
+ 1428  kubectl get pod -n f5-utils
+ 1429  kubectl get secrets licensestatus -n f5-utils -o jsonpath={'.data.licensestatus'} | base64 -d | jq
+ 1430  kubectl get cm -n f5-utils
+ 1431  kubectl get cm cpcl-config-cm -n f5-utils
+ 1432  kubectl get cm cpcl-config-cm -n f5-utils -oyaml
+ 1433  kubectl get cm cpcl-key-cm -n f5-utils -o yaml
+ 1434  kubectl get secrets licensestatus -n f5-utils -o jsonpath={'.data.licensestatus'} | base64 -d | jq
+ 1435  kubectl get pod -n f5-bn
+ 1436  kubectl get pod -n f5-bnk
+ 1437  kubectl logs f5-cne-controller-58847774d-sj8b9 -n f5-bnk | less
+ 1438  kubectl describe pod f5-tmm-7kwkr -n f5-bnk | less
+ 1439  kubectl get ippool -A
+ 1440  kubectl logs f5-cne-controller-58847774d-sj8b9 -n f5-bnk | less
+ 1441  kubectl get secrets licensestatus -n f5-utils -o jsonpath={'.data.licensestatus'} | base64 -d | jq
+ 1442  kubectl get pod -n f5-bnk
+ 1443  kubectl logs f5-tmm-7kwkr -n f5-bnk | less
+ 1444  kubectl get pod -n f5-utils
+ 1445  kubectl logs f5-toda-fluentd-6f8bd9d7d-nvfk6 -n f5-utils | less
+ 1446  kubectl delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1447  vi bnkgatewayclass-cr.yaml
+ 1448  kubectl apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1449  watch kubectl get pod -n f5-bnk
+ 1450  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- bash
+ 1451  kubectl get pod -n f5-bnk -o wide
+ 1452  kubectl exec -it f5-tmm-8b9n4 -c debug -n f5-bnk -- bash
+ 1453  ls
+ 1454  kubectl get f5-spk-vlan
+ 1455  kubectl get f5-spk-vlan -A
+ 1456  kubectl get f5-spkvlan -A
+ 1457  kubectl get crd -A | grep f5
+ 1458  kubectl get f5-spk-vlans -A
+ 1459  ls
+ 1460  less tmm-spk-vlan.yaml 
+ 1461  mv tmm-spk-vlan.yaml spk-vlan.yaml
+ 1462  vi spk-vlan.yaml 
+ 1463  kubectl apply -f spk-vlan.yaml -n f5-bnk
+ 1464  vi spk-vlan.yaml 
+ 1465  kubectl apply -f spk-vlan.yaml -n f5-bnk
+ 1466  kubectl exec -it f5-tmm-8b9n4 -c debug -n f5-bnk -- bash
+ 1467  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- bash
+ 1468  vi spk-vlan.yaml 
+ 1469  kubectl get f5-spk-vlans
+ 1470  kubectl get f5-spk-vlans -A
+ 1471  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip link
+ 1472  kubectl delete -f spk-vlan.yaml -n f5-bnk
+ 1473  vi spk-vlan.yaml 
+ 1474  kubectl apply -f spk-vlan.yaml -n f5-bnk
+ 1475  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip link
+ 1476  kubectl exec -it f5-tmm-8b9n4 -c debug -n f5-bnk -- ip link
+ 1477  kubectl get pod -n f5-bnk
+ 1478  kubectl logs f5-cne-controller-58847774d-w48sq -n f5-bnk | less
+ 1479  kubectl exec -it f5-tmm-8b9n4 -c debug -n f5-bnk -- ip link
+ 1480  kubectl delete -f spk-vlan.yaml -n f5-bnk
+ 1481  kubectl apply -f spk-vlan.yaml -n f5-bnk
+ 1482  kubectl get pod -n f5-utils
+ 1483  kubectl logs f5-toda-fluentd-6f8bd9d7d-c2g69 -n f5-utils | less
+ 1484  kubectl exec -it f5-tmm-8b9n4 -c debug -n f5-bnk -- ip link
+ 1485  kubectl logs f5-toda-fluentd-6f8bd9d7d-c2g69 -n f5-utils | less
+ 1486  kubectl get pod -n f5-bnk
+ 1487  kubectl logs f5-cne-controller-58847774d-w48sq -n f5-bnk | less
+ 1488  kubectl delete -f spk-vlan.yaml -n f5-bnk
+ 1489  cp spk-vlan.yaml spk-vlan-ext.yaml
+ 1490  vi spk-vlan-ext.yaml 
+ 1491  cp spk-vlan.yaml spk-vlan-ext.yaml
+ 1492  vi spk-vlan-ext.yaml 
+ 1493  kubectl apply -f spk-vlan-ext.yaml -n f5-bnk
+ 1494  kubectl exec -it f5-tmm-8b9n4 -c debug -n f5-bnk -- ip link
+ 1495  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip link
+ 1496  kubectl delete -f spk-vlan-ext.yaml -n f5-bnk
+ 1497  vi spk-vlan-ext.yaml 
+ 1498  kubectl apply -f spk-vlan-ext.yaml -n f5-bnk
+ 1499  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip link
+ 1500  kubectl get pod -n f5-bnk
+ 1501  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip a
+ 1502  kubectl logs f5-cne-controller-58847774d-w48sq -n f5-bnk | less
+ 1503  kubectl get pod -n f5-utils
+ 1504  kubectl logs f5-toda-fluentd-6f8bd9d7d-c2g69 -n f5-utils | less
+ 1505  kubectl logs f5-toda-fluentd-6f8bd9d7d-c2g69 -n f5-utils | grep -i selfip
+ 1506  kubectl logs f5-toda-fluentd-6f8bd9d7d-c2g69 -n f5-utils | grep -i vlan
+ 1507  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip a
+ 1508  kubectl get f5-spk-vlans -A
+ 1509  kubectl describe f5-spk-vlans ext-vlan -n f5-bnk | less
+ 1510  kubectl logs f5-cne-controller-58847774d-w48sq -n f5-bnk | less
+ 1511  kubectl delete -f spk-vlan-ext.yaml -n f5-bnk
+ 1512  vi spk-vlan-ext.yaml 
+ 1513  kubectl apply -f spk-vlan-ext.yaml -n f5-bnk
+ 1514  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip a
+ 1515  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip -br a
+ 1516  kubectl logs f5-cne-controller-58847774d-w48sq -n f5-bnk | less
+ 1517  kubectl get pod -n f5-utils
+ 1518  kubectl logs f5-toda-fluentd-6f8bd9d7d-c2g69 -n f5-utils| less
+ 1519  kubectl logs f5-toda-fluentd-6f8bd9d7d-c2g69 -n f5-utils| grep "48.241"
+ 1520  kubectl get pod -n f5-bnk -o wide
+ 1521  kubectl get pod -n f5-utils -o wide
+ 1522  kubectl describe node worker02 | less
+ 1523  kubectl label node worker02 -app
+ 1524  kubectl label node --help
+ 1525  kubectl label node worker02 app-
+ 1526  kubecel get pod -n f5-bnk
+ 1527  kubectl get pod -n f5-bnk
+ 1528  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip a
+ 1529  kubectl delete -f spk-vlan-ext.yaml -n f5-bnk
+ 1530  kubectl apply -f spk-vlan-ext.yaml -n f5-bnk
+ 1531  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip a
+ 1532  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip br a
+ 1533  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip -br a
+ 1534  kubectl get pod -n f5-bnk
+ 1535  kubectl logs f5-cne-controller-58847774d-w48sq -n f5-bnk | less
+ 1536  kubectl delete -f spk-vlan-ext.yaml -n f5-bnk
+ 1537  vi spk-vlan-ext.yaml 
+ 1538  kubectl apply -f spk-vlan-ext.yaml -n f5-bnk
+ 1539  kubectl logs f5-cne-controller-58847774d-w48sq -n f5-bnk | less
+ 1540  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip -br a
+ 1541  kubectl logs f5-cne-controller-58847774d-w48sq -n f5-bnk | less
+ 1542  kubectl delete -f spk-vlan-ext.yaml -n f5-bnk
+ 1543  vi spk-vlan-ext.yaml 
+ 1544  kubectl apply -f spk-vlan-ext.yaml -n f5-bnk
+ 1545  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip -br a
+ 1546  kubectl get pod -n f5-utils
+ 1547  kubectl pod -n f5-bnk
+ 1548  kubectl get pod -n f5-bnk
+ 1549  kubectl logs f5-tmm-sj2kw -n f5-bnk | less
+ 1550  kubectl exec -it ds/f5-tmm -n f5-bnk -- bash
+ 1551  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- bash
+ 1552  ls
+ 1553  kubectl delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1554  vi bnkgatewayclass-cr.yaml
+ 1555  kubectl get pod -n f5-bnk
+ 1556  kubectl get pod -n f5-utils
+ 1557  kubectl apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1558  watch kubectl get pod -n f5-bnk
+ 1559  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- bash
+ 1560  kubectl get pod -n f5-bnk
+ 1561  kubectl logs f5-cne-controller-58847774d-kngth -n f5-bnk > cne-controller.log
+ 1562  exit
+ 1563  kubectl get f5-spk-vlans -A
+ 1564  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- bash
+ 1565  kubectl get pod -n f5-utils
+ 1566  kubectl logs f5-toda-fluentd-6f8bd9d7d-vnccq -n f5-utils | less
+ 1567  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- configview vlan
+ 1568  kubectl exec -it ds/f5-tmm -n f5-bnk 
+ 1569  kubectl exec -it ds/f5-tmm -n f5-bnk -- bash
+ 1570  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- bash
+ 1571  kubectl describe f5-spk-vlans -A
+ 1572  kubectl get pod -n f5-utils
+ 1573  kubectl logs -f f5-toda-fluentd-6f8bd9d7d-vnccq -n f5-utils
+ 1574  kubectl get pod -n f5-bn
+ 1575  kubectl get pod -n f5-bnk
+ 1576  kubectl logs f5-tmm-mc6gz -n f5-bn
+ 1577  kubectl logs f5-tmm-mc6gz -n f5-bnk
+ 1578  kubectl logs f5-tmm-mc6gz -c f5-fluentbit -n f5-bnk
+ 1579  kubectl logs f5-tmm-mc6gz -c f5-fluentbit -n f5-bnk > f5-fluentbit.log
+ 1580  exit
+ 1581  cd bnk
+ 1582  ls
+ 1583  cat bnkgatewayclass-cr.yaml
+ 1584  ping 192.168.48.241
+ 1585  ping 192.168.48.1
+ 1586  ping 192.168.48.241
+ 1587  kubectl get pod -n f5-bnk
+ 1588  kubectl logs -f f5-cne-controller-58847774d-kngth -n f5-bnk
+ 1589  cd bnk/
+ 1590  kubectl delete -f spk-vlan-ext.yaml -n f5-bnk
+ 1591  kubectl apply -f spk-vlan-ext.yaml -n f5-bnk
+ 1592  ll
+ 1593  cd bnk
+ 1594  ll
+ 1595  k apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1596  k get pods -A
+ 1597  k describe pod -n f5-bnk f5-node-labeler-7r4lj
+ 1598  k get pods -A
+ 1599  k logs -f -n f5-bnk f5-tmm-6v2j9
+ 1600  k get pods -A
+ 1601  k logs -f -n f5-bnk f5-tmm-6v2j9
+ 1602  k get pods -A
+ 1603  k logs -f flo-f5-lifecycle-operator-fc86765b7-p8wmz -n f5-bnk
+ 1604  ls
+ 1605  vi macvlan.yaml 
+ 1606  ll
+ 1607  k get pods -A
+ 1608  k logs -f f5-spk-cwc-768df65898-mkxrn -n f5-bnk
+ 1609  k logs -f f5-spk-cwc-768df65898-mkxrn -n f5-utils
+ 1610  k get pods -A
+ 1611  k logs -f f5-cne-controller-58847774d-sj8b9 -n f5-utils
+ 1612  k logs -f f5-cne-controller-58847774d-sj8b9 -n f5-bnk
+ 1613  cilium config view
+ 1614  vi tmm-spk-vlan.yaml 
+ 1615  k get pods -A
+ 1616  vi bnkgatewayclass-cr.yaml
+ 1617  ping 192.168.48.1
+ 1618  k get pods -A
+ 1619  vi flo-values
+ 1620  vi flo-values-new.yaml 
+ 1621  kubectl get secret cwc-auth-token -n f5-utils -o jsonpath="{.data.token}" | base64 --decode; echo ""
+ 1622  ls
+ 1623  cd bnk/
+ 1624  ls
+ 1625  helm list -A
+ 1626  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip -a
+ 1627  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip a
+ 1628  kubectl get f5-spk-vlans -A
+ 1629  ls
+ 1630  kubectl delete -f spk-vlan-ext.yaml -n f5-bnk
+ 1631  kubectl delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1632  vi del_crd.sh
+ 1633  kubectl delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1634  chod 700 del_crd.sh 
+ 1635  chmod 700 del_crd.sh 
+ 1636  kubectl appply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1637  kubectl apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1638  watch kubectl get pod -n f5-bnk
+ 1639  kubectl describe pod f5-tmm-6464w -n f5-bnk | less
+ 1640  kubectl get net-attach-def -A
+ 1641  watch kubectl get pod -n f5-bnk -o wide
+ 1642  kubectl describe net-attach-def sf-internal -n f5-bnk | less
+ 1643  kubectl delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1644  kubectl get pod -n f5-bnk -o wide
+ 1645  vi bnkgatewayclass-cr.yaml
+ 1646  kubectl get pod -n f5-bnk -o wide
+ 1647  kubectl describe pod sf-internal-869df967c4-4pzmm -n f5-bnk | less
+ 1648  vi bnkgatewayclass-cr.yaml
+ 1649  kubectl apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1650  watch kubectl get pod -n f5-bnk -o wide
+ 1651  kubectl apply -f spk-vlan-ext.yaml -n f5-bnk
+ 1652  kubectl get f5-spk-vlans -A
+ 1653  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip a
+ 1654  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip a | grep vlan
+ 1655  watch kubectl get pod -n f5-bnk -o widekuexit
+ 1656  eeeq
+ 1657  exit
+ 1658  kubectl get pod -n f5-bnk
+ 1659  kubectl exec -it ds/f5-tmm -n f5-bnk -- ip a
+ 1660  kubectl exec -it ds/f5-tmm -n f5-bnk -- bash
+ 1661  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- bash
+ 1662  kubectl get pod -n f5-bnk
+ 1663  kubectl logs f5-cne-controller-58847774d-8mblx -n f5-bnk | less
+ 1664  kubectl logs f5-cne-controller-58847774d-8mblx -n f5-bnk > cne-controller.log
+ 1665  kubectl get pod -n f5-utils
+ 1666  kubectl logs f5-toda-fluentd-6f8bd9d7d-d9q6j -n f5-utils | less
+ 1667  kubectl logs f5-toda-fluentd-6f8bd9d7d-d9q6j -n f5-utils > toda-fluentd.log
+ 1668  exit
+ 1669  history | grep version
+ 1670  k version
+ 1671  kubectl get pod -n f5-bnk
+ 1672  kubectl get pod -n f5-utils
+ 1673  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip -br a
+ 1674  kubectl describe f5-spk-vlans -A
+ 1675  kubectl get node -o wide
+ 1676  kubectl get pod -n f5-bnk
+ 1677  kubectl get pod -n f5-utils
+ 1678  kubectl get secrets licensestatus -n f5-utils -o jsonpath={'.data.licensestatus'} | base64 -d | jq
+ 1679  kubectl get f5-spk-vlans -A
+ 1680  kubectl logs f5-tmm-jrxd7 -n f5-bnk
+ 1681  kubectl logs f5-toda-fluentd-6f8bd9d7d-d9q6j -n f5-utils | less
+ 1682  kubectl describe f5-spk-vlans external-vlan -n f5-bnk
+ 1683  kubectl logs f5-cne-controller-58847774d-8mblx -n f5-bnk | less
+ 1684  kubectl get pod -n f5-bnk -o wide
+ 1685  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- bash
+ 1686  kubectl cluster dump > kube-dump
+ 1687  kubectl cluster-info dump > kube-dump
+ 1688  less kube-dump 
+ 1689  exit
+ 1690  k get pods -A
+ 1691  k get pods -n ns-app
+ 1692  k describe pod -n ns-app nginx-575cc9d559-llz69
+ 1693  k get certificate -A
+ 1694  kubectl describe certificate nginx-cert -n ns-app
+ 1695  k get certificate -A
+ 1696  kubectl describe certificate nginx-cert -n ns-app
+ 1697  kubectl get secret nginx-tls -n ns-app
+ 1698  kubectl get clusterissuer
+ 1699  kubectl get issuer -A
+ 1700  ll
+ 1701  cat cne_pull_64.json | docker login -u _json_key_base64 --password-stdin repo.f5.com
+ 1702  k --show-label
+ 1703  ll
+ 1704  cd bnk
+ 1705  ll
+ 1706  history | grep network
+ 1707  k get network-attachment-definition -A
+ 1708  k get pods -A
+ 1709  k exec -it f5-tmm-mc6gz -n f5-bnk ip addr
+ 1710  k exec -it f5-tmm-mc6gz -n f5-bnk ip\ addr
+ 1711  k exec -it f5-tmm-mc6gz -n f5-bnk ip \addr
+ 1712  k exec -it f5-tmm-mc6gz -n f5-bnk sh
+ 1713  k exec f5-tmm-mc6gz -n f5-bnk -it sh
+ 1714  history | grep exec
+ 1715  k exec -it f5-tmm-mc6gz -n f5-bnk -c debug -- ip addr
+ 1716  k get network-attachment-definition -A
+ 1717  k describe -n f5-bnk sf-internal
+ 1718  k describe network-attachment-definition -n f5-bnk sf-internal
+ 1719  kubectl label node worker01 role=controller-nginx
+ 1720  apiVersion: apps/v1
+ 1721  kind: Deployment
+ 1722  metadata:
+ 1723  spec:
+ 1724  vi nginx-deploy.yaml
+ 1725  k apply -f nginx-deploy.yaml 
+ 1726  k get pods -A | grep nginx
+ 1727  k get pods -A | grep inter
+ 1728  vi nginx-deploy.yaml
+ 1729  k get pods -A
+ 1730  helm list -A
+ 1731  helm delete -n f5-utils flo
+ 1732  k get crd -A
+ 1733  vi nginx-deploy.yaml
+ 1734  k apply -f nginx-deploy.yaml 
+ 1735  k delete -f nginx-deploy.yaml 
+ 1736  vi nginx-deploy.yaml
+ 1737  k delete -f nginx-deploy.yaml 
+ 1738  vi nginx-deploy.yaml
+ 1739  k create ns ns-app
+ 1740  vi nginx-deploy.yaml
+ 1741  vi nginx-deploy.yaml 
+ 1742  k apply -f nginx-deploy.yaml 
+ 1743  vi nginx-svc.yaml
+ 1744  k apply -f nginx-svc.yaml 
+ 1745  ll
+ 1746  k get svc -ns-app
+ 1747  k get svc -n ns-app
+ 1748  netstat -alpn | grep 80
+ 1749  apt install net-tools -y
+ 1750  netstat -alpn | grep 80
+ 1751  curl http://localhost
+ 1752  k get svc -n ns-app 
+ 1753  curl http://10.110.156.58
+ 1754  vi nginx-cert.yaml
+ 1755  k apply -f nginx-
+ 1756  k apply -f nginx-cert.yaml 
+ 1757  k get certificate 
+ 1758  k get cretificate -A
+ 1759  vi nginx-conf.yaml
+ 1760  k apply -f nginx-conf.yaml 
+ 1761  vi nginx-deploy.yaml 
+ 1762  k get svc
+ 1763  k get pods -A
+ 1764  k delete pod sf-internal-869df967c4-4pzmm -n f5-bnk
+ 1765  k get pods -A
+ 1766  k get deployment -n f5-bnk
+ 1767  k delete deployment sf-internal -n f5-bnk
+ 1768  k get pods -A
+ 1769  vi nginx-conf.yaml 
+ 1770  k apply -f nginx-conf.yaml 
+ 1771  vi nginx-deploy.yaml 
+ 1772  k apply -f nginx-deploy.yaml 
+ 1773  vi nginx-svc.yaml 
+ 1774  k apply -f nginx-svc.yaml 
+ 1775  k get svc -n ns-app
+ 1776  curl -k https://10.110.156.58 -k
+ 1777  curl -k https://10.110.156.58
+ 1778  curl http://10.110.156.58
+ 1779  ls
+ 1780  cd ~/bnk/
+ 1781  ls
+ 1782  ll
+ 1783  history 
+ 1784  kubectl get pod -n f5-bnk
+ 1785  ping 192.168.48.241
+ 1786  ip a
+ 1787  kubectl get node -o wide
+ 1788  ssh ncurity@192.168.47.241
+ 1789  ssh root@192.168.47.241
+ 1790  exit
+ 1791  ls
+ 1792  pwd
+ 1793  exit
+ 1794  ip add
+ 1795  history
+ 1796  ip add
+ 1797  exit
+ 1798  k get pods -A -o wide | grep ngingx
+ 1799  k get pods -A -o wide | grep nginx
+ 1800  k get pods -A
+ 1801  ll
+ 1802  k get deploy -A
+ 1803  k desribe deploy nginx -n ns-app
+ 1804  k  deploy nginx -n ns-app
+ 1805  ll
+ 1806  cd bnk
+ 1807  ll
+ 1808  ls -al
+ 1809  k delete -f nginx-deploy.yaml 
+ 1810  k get pods -A
+ 1811  ll
+ 1812  k apply -f nginx-deploy.yaml 
+ 1813  kubectl exec -it deploy/nginx -n ns-app -- curl -vk https://nginx
+ 1814  k get deployment
+ 1815  k get deployment -n ns-app
+ 1816  kubectl get nodes --show-labels | grep controller-nginx
+ 1817  kubectl get secret nginx-tls -n ns-app
+ 1818  kubectl get certificate -n ns-app
+ 1819  kubectl get clusterissuer
+ 1820  kubectl get clusterissuer internal-ca
+ 1821  kubectl get clusterissuer
+ 1822  kubectl get clusterissuer -o wide
+ 1823  vi nginx-cert.yaml 
+ 1824  k apply -f nginx-cert.yaml 
+ 1825  k delete -f nginx-svc.yaml 
+ 1826  k delete -f nginx-deploy.yaml 
+ 1827  k delete -f nginx-conf.yaml 
+ 1828  k apply -f nginx-conf.yaml 
+ 1829  k apply -f nginx-deploy.yaml 
+ 1830  k apply -f nginx-svc.yaml 
+ 1831  kubectl exec -it deploy/nginx -n ns-app -- curl -vk https://nginx
+ 1832  k get pods -A
+ 1833  vi bnkgatewayclass-cr.yaml
+ 1834  k get pods -A
+ 1835  vi nginx-deploy.yaml 
+ 1836  k apply -f nginx-deploy.yaml 
+ 1837  k get pods -A | grep ng
+ 1838  k get all -n ns-app
+ 1839  k get pods -A -o wide
+ 1840  history 
+ 1841  k get pods -A | grep tmm
+ 1842  k exec -it f5-tmm-qhnn5 -n f5-bnk -c debug -- sh
+ 1843  k get issuer
+ 1844  k get issuer -A
+ 1845  k get clusterissuer -A
+ 1846  k get clusterissuer -A -o wide
+ 1847  k get clusterissuer -o yaml -A
+ 1848  ll
+ 1849  vi nginx-cert.yaml 
+ 1850  k get clusterissuer 
+ 1851  k get certificate
+ 1852  k get certificate -A
+ 1853  k get certificate -n ns-app nginx-cert
+ 1854  k get certificate -n ns-app nginx-cert -o yaml
+ 1855  k get secret -n ns-app
+ 1856  vi nginx-conf.yaml 
+ 1857  vi nginx-deploy.yaml 
+ 1858  cat nginx-deploy.yaml 
+ 1859  cat nginx-conf.yaml 
+ 1860  cat nginx-cert.yaml 
+ 1861  cat nginx-svc.yaml 
+ 1862  ip add
+ 1863  k get gateway
+ 1864  k get gateway -A
+ 1865  k get pods -A
+ 1866  k logs -f f5-cne-controller-654955c59f-b7kqn -n f5-bnk
+ 1867  k get pods -A
+ 1868  cilium config view
+ 1869  net route
+ 1870  ip route
+ 1871  k get pods -A
+ 1872  cilium config view
+ 1873  cilium status
+ 1874  helm list 
+ 1875  helm list -A
+ 1876  k get pods -A
+ 1877  kubectl get pod -n f5-bnk
+ 1878  kubectl get pod -n f5-utils
+ 1879  kubectl get bnkgatewayclass
+ 1880  kubectl get bnk-gatewayclass
+ 1881  kubectl get crd -A | grep cne
+ 1882  kubectl get crd -A | grep bnkgateway
+ 1883  kubectl get f5-bnkgateways
+ 1884  kubectl get bnkgatewayclasses
+ 1885  kubectl get bnkgatewayclasses -A
+ 1886  history | grep flo
+ 1887  helm upgrade flo oci://repo.f5.com/charts/f5-lifecycle-operator --version v1.198.4-0.1.36 -f flo-values-new.yaml -n f5-bnk
+ 1888  cd bnk/
+ 1889  helm upgrade flo oci://repo.f5.com/charts/f5-lifecycle-operator --version v1.198.4-0.1.36 -f flo-values-new.yaml -n f5-bnk
+ 1890  kubectl get pod -n f5-bnk
+ 1891  kubectl get pod -n f5-utils
+ 1892  less flo-values
+ 1893  less flo-values-new.yaml 
+ 1894  kubectl get certificate -A -ojsonpath="{range .items[*]}{.metadata.name} not before: {.status.notBefore} not after: {.status.notAfter} renewal time: {.status.renewalTime}{'\n'}{end}" | column -t
+ 1895  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- bash
+ 1896  kubectl get f5-spk-vlans -A
+ 1897  kubectl get pod -n f5-utils
+ 1898  kubectl logs f5-spk-cwc-768df65898-zzd9m -n f5-bnk | less
+ 1899  kubectl logs f5-spk-cwc-768df65898-zzd9m -n f5-utils | less
+ 1900  kubectl delete -f spk-vlan-ext.yaml -n f5-bnk
+ 1901  kubectl delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1902  kubectl get pod -n f5-utils
+ 1903  vi bnkgatewayclass-cr.yaml
+ 1904  kubectl get pod -n f5-bnk
+ 1905  kubectl apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1906  watch kubectl get pod -n f5-bnk
+ 1907  kubectl get pod -n f5-bnk
+ 1908  kubectl apply -f spk-vlan-ext.yaml -n f5-bnk
+ 1909  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- ip a
+ 1910  kubectl get pod -n f5-bnk
+ 1911  kubectl logs f5-tmm-n6ncw -n f5-bnk | less
+ 1912  tmctl -d blade tmm/device_probed
+ 1913  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- bash
+ 1914  kubectl delete -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1915  vi bnkgatewayclass-cr.yaml
+ 1916  kubectl get pod -n f5-bnk
+ 1917  kubectl apply -f bnkgatewayclass-cr.yaml -n f5-bnk
+ 1918  watch kubectl get pod -n f5-bnk
+ 1919  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- bash
+ 1920  kubectl delete -f spk-vlan-ext.yaml -n f5-bnk
+ 1921  vi spk-vlan-ext.yaml 
+ 1922  kubectl apply -f spk-vlan-ext.yaml -n f5-bnk
+ 1923  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- bash
+ 1924  less bnkgatewayclass-cr.yaml
+ 1925  kubectl get gateway -A
+ 1926  kubectl describe f5-gateway-class gateway1 | less
+ 1927  kubectl gatewayclass
+ 1928  kubectl get gatewayclass
+ 1929  kubectl get gateway -A
+ 1930  kubectl exec -it ds/f5-tmm -n f5-bnk -c debug -- bash
+ 1931  kubectl get deploy -n web
+ 1932  kubectl exec -it deploy/nginx-web -c netshoot -n web -- bash
+ 1933  kubectl get pod -n f5-bnk
+ 1934  kubectl logs f5-tmm-qhnn5 -n f5-bnk | less
+ 1935  kubectl exec -it ds/f5-tmm -n f5-bnk -c debug -- bash
+ 1936  clear
+ 1937  kubectl exec -it ds/f5-tmm -n f5-bnk -c debug -- bash
+ 1938  helm list -A
+ 1939  helm get values cilium -n kube-system | less
+ 1940  helm get values cilium -n kube-system -oyaml | less
+ 1941  helm get manifest cilium -n kube-system | less
+ 1942  kubectl get cm -n kube-system 
+ 1943  kubectl get cm cilium-config -n kube-system -o yaml | less
+ 1944  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- bash
+ 1945  kubectl get deploy -A
+ 1946  kubectl exec -it nginx -n ns-app -- bash
+ 1947  kubectl exec -it deploy/nginx -n ns-app -- bash
+ 1948  kubectl get pod -n ns-app
+ 1949  kubectl exec -it deploy/nginx -n ns-app -- bash
+ 1950  kubectl get node -o wide
+ 1951  kubectl get pod -n f5-bnk
+ 1952  kubectl get pod -n f5-utils
+ 1953  kubectl get secrets licensestatus -n f5-utils -o jsonpath={'.data.licensestatus'} | base64 -d | jq
+ 1954  kubectl get f5-spk-vlans -A
+ 1955  kubectl logs f5-spk-cwc-768df65898-zzd9m -n f5-utils -c spk-cwc | grep -i verification
+ 1956  kubectl logs f5-spk-cwc-768df65898-zzd9m -n f5-utils -c f5-spk-cwc | grep -i verification
+ 1957  kubectl get net-attach-def -A
+ 1958  kubectl get net-attach-def -A -o yaml | less
+ 1959  kubectl exec -it ds/f5-tmm -c debug -n f5-bnk -- bash
+ 1960  kubectl get pod -n f5-utils
+ 1961  kubectl logs f5-toda-fluentd-6f8bd9d7d-d9q6j -n f5-utils | less
+ 1962  kubectl logs f5-toda-fluentd-6f8bd9d7d-d9q6j -n f5-utils | grep external-vlan
+ 1963  kubectl get pod -n f5-bnk
+ 1964  kubectl logs f5-cne-controller-58847774d-8mblx -n f5-bnk | grep external-vlan | less
+ 1965  kubectl get f5-spk-vlans -A
+ 1966  kubectl logs f5-toda-fluentd-6f8bd9d7d-d9q6j -f -n f5-utils | grep external-vlan
+ 1967  kubectl get deploy -A
+ 1968  kubectl create namespace web
+ 1969  cd bnk/
+ 1970  ls
+ 1971  mkdir web
+ 1972  cd web/
+ 1973  vi web-app1.yaml
+ 1974  kubectl apply -f web-app1.yaml -n web
+ 1975  kubectl get pod -n web
+ 1976  vi httpgw-web-app1.yaml
+ 1977  kubectl get pod -n web
+ 1978  kubectl apply -f httpgw-web-app1.yaml 
+ 1979  kubectl get svc -n web
+ 1980  kubectl get endpoints -n web
+ 1981  cd ..
+ 1982  vi static-route.yaml
+ 1983  kubectl apply -f static-route.yaml -n f5-bnk
+ 1984  kubectl delete -f static-route.yaml -n f5-bnk
+ 1985  vi static-route.yaml 
+ 1986  kubectl apply -f static-route.yaml -n f5-bnk
+ 1987  kubectl get f5-static-route
+ 1988  kubectl get f5-staticroute
+ 1989  less static-route.yaml 
+ 1990  kubectl get f5-spk- staticroute
+ 1991  kubectl get f5-spk-staticroute
+ 1992  kubectl get f5-spk-staticroute -A
+ 1993  kubectl get deploy -n web
+ 1994  kubectl scale replicas=2 deploy/nginx-web -n web
+ 1995  kubectl scale replica=2 deploy/nginx-web -n web
+ 1996  kubectl scale --replicas=2 deploy/nginx-web -n web
+ 1997  kubectl get deploy -n web
+ 1998  ll
+ 1999  history > /root/history.txt

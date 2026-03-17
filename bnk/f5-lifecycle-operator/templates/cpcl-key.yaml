@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cpcl-key-cm
+  namespace: f5-utils
+data:
+  jwt.key: |+
+    {
+      "keys": [
+        {{- if .Values.license }}
+        {
+          "kid": "{{ .Values.license.kid | default "v1" }}",
+          "alg": "{{ .Values.license.alg | default "RS512" }}",
+          "kty": "{{ .Values.license.kty | default "RSA" }}",
+          "n": "{{ .Values.license.modulus | default "..." }}",
+          "e": "{{ .Values.license.exponent | default "AQAB" }}",
+          "x5c": {{ .Values.license.x5c | default (list "..." "..." "..." "...") | toJson }},
+          "use": "{{ .Values.license.use | default "sig" }}"
+        }
+        {{- else }}
+        {
+          "kid": "v1",
+          "alg": "RS512",
+          "kty": "RSA",
+          "n": "...",
+          "e": "AQAB",
+          "x5c": {{ default (list "..." "..." "..." "...") | toJson }},
+          "use": "sig"
+        }
+        {{- end }}
+      ]
+    }

@@ -1,0 +1,77 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: post-redirect-get-gw
+  namespace: web
+spec:
+  addresses:
+  - type: "IPAddress"
+    value: 192.168.48.202
+  gatewayClassName: f5-gateway-class
+  listeners:
+  - name: http-post-redirect-get
+    protocol: HTTP
+    port: 80
+    allowedRoutes:
+      namespaces:
+        from: "All"
+      kinds:
+      - kind: HTTPRoute
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-post-redirect-get
+  namespace: web
+spec:
+  parentRefs:
+  - name: post-redirect-get-gw
+    sectionName: http-post-redirect-get
+  hostnames:
+  - www.f5bnk.com
+  rules:
+  - matches:
+    - path:
+        type: Exact
+        value: /latte/coffee
+      method: POST
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        path:
+          type: ReplaceFullPath
+          replaceFullPath: /black/tea
+  - backendRefs:
+    - name: httpbin
+      port: 8080
+---
+apiVersion: "k8s.f5net.com/v1"
+kind: F5BigCneIrule
+metadata:
+  name: irule-post-redirect-get
+  namespace: web
+spec:
+  iRule: >
+    when HTTP_REQUEST {
+      if { [HTTP::method] eq "POST" } {
+      HTTP::respond 303 Location "http://[getfield [HTTP::host] ":" 1]/black/tea"
+      }
+    }
+---
+apiVersion: "gateway.k8s.f5net.com/v1alpha1"
+kind: BNKNetPolicy
+metadata:
+  name: netpolicy-post-redirect-get
+  namespace: web
+spec:
+  extensionRefs:
+  - kind: F5BigCneIrule
+    name: irule-post-redirect-get
+    group: k8s.f5net.com
+  targetRefs:
+  - kind: Gateway
+    name: post-redirect-get-gw
+    group: gateway.networking.k8s.io
+    sectionName: http-post-redirect-get
+
+

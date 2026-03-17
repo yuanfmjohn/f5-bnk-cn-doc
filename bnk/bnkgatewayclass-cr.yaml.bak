@@ -1,0 +1,59 @@
+apiVersion: k8s.f5.com/v1
+kind: BNKGatewayClass
+metadata:
+  labels:
+    app.kubernetes.io/name: f5-lifecycle-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: "f5-alpha-f5-cne-controller"
+  namespace: f5-alpha
+spec:
+  manifestVersion: 2.1.0-3.1736.1-0.1.27
+  storageClassName: "STORAGE_CLASS_NAME"
+  telemetry:
+    loggingSubsystem:
+      enabled: true
+    metricSubsystem:
+      enabled: true
+  certificate:
+    clusterIssuer: arm-ca-cluster-issuer
+  deploymentSize: "Small"
+  image:
+    repository: devrepo.f5.com/images
+    imagePullSecrets:
+    - name: far-secret
+    imagePullPolicy: Always
+  networkAttachments:
+    - sriov-net-1
+  dynamicRouting:
+    enabled: true
+  # AFM
+  firewallACL:
+    enabled: true
+  pseudoCNI:
+    enabled: true
+  # Core dump files
+  coreCollection:
+    enabled: true
+  advanced:
+    envDiscovery:
+      enabled: true
+      stopOnFail: true
+      runAfterSuccess: true
+    cneController:
+      env:
+      - name: "TMM_DEFAULT_MTU"
+        value: "9000"
+    demoMode:
+      enabled: false
+    maintenanceMode:
+      enabled: false
+    tmm:
+      env:
+      - name: "TMM_CALICO_ROUTER"
+        value: "default"
+      - name: TMM_DEFAULT_MTU
+        value: "9000"
+    pseudoCNI:
+      env:
+      - name: "EXCLUDE_CIDR"
+        value: "10.19.1.80/16,bb10::19:1:80/96"

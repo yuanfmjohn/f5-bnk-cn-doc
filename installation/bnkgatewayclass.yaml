@@ -1,0 +1,56 @@
+apiVersion: k8s.f5.com/v1
+kind: BNKGatewayClass
+metadata:
+  name: f5-cne-controller
+  namespace: f5-bnk
+
+spec:
+  manifestVersion: 2.1.0-3.1736.1-0.1.27
+  containerPlatform: Generic
+  storageClassName: nfs-csi
+
+  telemetry:
+    loggingSubsystem:
+      enabled: false
+    metricSubsystem:
+      enabled: false
+
+  certificate:
+    clusterIssuer: f5-bnk-ca-cluster-issuer
+
+  deploymentSize: Small
+
+  image:
+    repository: repo.f5.com/images
+    imagePullPolicy: Always
+    imagePullSecrets:
+    - name: far-secret
+
+  networkAttachments:
+  - sf-external
+
+  dynamicRouting:
+    enabled: true
+
+  firewallACL:
+    enabled: true
+
+  pseudoCNI:
+    enabled: true
+  advanced:
+    demoMode:
+      enabled: true
+    maintenanceMode:
+      enabled: true
+    tmm:
+      env:
+      - name: "TMM_CALICO_ROUTER"
+        value: "default"
+      - name: "TMM_DEFAULT_MTU"
+        value: "9000"
+      - name: "TMM_MAPRES_ADDL_VETHS_ON_DP"
+        value: "TRUE"
+    pseudoCNI:
+      env:
+      - name: "EXCLUDE_CIDR"
+        value: "10.244.0.0/16, 10.96.0.0/12"

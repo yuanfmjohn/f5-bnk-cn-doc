@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coffee
+  namespace: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: coffee
+  template:
+    metadata:
+      labels:
+        app: coffee
+    spec:
+      containers:
+      - name: coffee
+        image: pleshakov/nginx-hello:0.1
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coffee-svc
+  namespace: web
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: coffee
+  type: ClusterIP  # NodePort에서 ClusterIP로 변경 (Ingress가 외부 접근 처리)
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tea
+  namespace: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tea 
+  template:
+    metadata:
+      labels:
+        app: tea 
+    spec:
+      containers:
+      - name: tea 
+        image: pleshakov/nginx-hello:0.1
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tea-svc
+  namespace: web
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: tea
+  type: ClusterIP

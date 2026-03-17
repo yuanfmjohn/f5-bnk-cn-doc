@@ -1,0 +1,61 @@
+# fluentd-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f5-toda-fluentd
+  namespace: f5-utils
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fluentd
+  template:
+    metadata:
+      labels:
+        app: fluentd
+    spec:
+      containers:
+      - name: fluentd
+        image: fluent/fluentd:v1.16-1
+        ports:
+        - containerPort: 54321
+          protocol: TCP
+        volumeMounts:
+        - name: config
+          mountPath: /fluentd/etc
+      volumes:
+      - name: config
+        configMap:
+          name: fluentd-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: f5-toda-fluentd
+  namespace: f5-utils
+spec:
+  selector:
+    app: fluentd
+  ports:
+  - name: forward
+    port: 54321
+    targetPort: 54321
+    protocol: TCP
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluentd-config
+  namespace: f5-utils
+data:
+  fluent.conf: |
+    <source>
+      @type forward
+      port 54321
+      bind 0.0.0.0
+    </source>
+
+    <match **>
+      @type stdout
+    </match>

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: licenseserver-rootca
+  namespace: f5-utils
+data:
+  {{- if and .Values.license .Values.license.licenseserverrootca }}
+  licenseserver-rootca.txt: |-
+    {{ .Values.license.licenseserverrootca | nindent 4 | trim }}
+  {{- end }}

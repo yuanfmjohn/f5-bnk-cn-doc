@@ -1,0 +1,13 @@
+[req_ext]
+
+subjectAltName = @alt_names
+
+[alt_names]
+
+DNS.1 = grpc-svc
+DNS.2 = grpc-pccd-svc
+DNS.3 = grpc-ipsd-svc
+DNS.4 = otel-collector
+DNS.5 = grpc-dnsx-svc
+DNS.6 = grpc-gslb-svc
+DNS.7 = grpc-gslb-probe-agent-svc

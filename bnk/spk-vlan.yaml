@@ -1,0 +1,27 @@
+apiVersion: k8s.f5net.com/v1
+kind: F5SPKVlan
+metadata:
+  name: "vlan-external"
+spec:
+  name: external
+  tag: 0
+  interfaces:
+    - "1.1"
+  selfip_v4s:
+    - "192.168.48.241"
+    - "192.168.48.242"
+  prefixlen_v4: 24
+---
+apiVersion: k8s.f5net.com/v1
+kind: F5SPKVlan
+metadata:
+  name: "vlan-internal"
+spec:
+  name: internal
+  tag: 0
+  interfaces:
+    - "1.2"
+  selfip_v4s:
+    - "192.168.46.241"
+    - "192.168.46.242"
+  prefixlen_v4: 24

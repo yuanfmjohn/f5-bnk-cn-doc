@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cpcl-config-cm
+  namespace: f5-utils
+data:
+  # CPCL initialisation configuration
+  {{- if .Values.license }}
+  operation_mode: {{ .Values.license.operationMode }}
+  signed_verify_cert_path: "/etc/cm20/cpcl/private/key/jwt.key"
+  log_level: {{ .Values.license.logLevel }}
+  teem_cert_url: {{ .Values.license.teemCertUrl }}
+  teem_entitlement_url: {{ .Values.license.teemEntitlementUrl }}
+  teem_initial_config_url: {{ .Values.license.teemInitialConfigUrl }}
+  licenseserver_root_ca_path: "{{- if .Values.license.licenseserverrootca }}/etc/cm20/licenseserver-rootca/licenseserver-rootca.txt{{- else }}{{- end }}"
+
+  # Device registration API arguments
+  jwt: {{ .Values.license.jwt }}
+  digital_asset_version: "1.2.0"
+  custom_id: {{ .Values.license.friendlyName }}
+  {{- else }}
+  operation_mode: 
+  signed_verify_cert_path: "/etc/cm20/cpcl/private/key/jwt.key"
+  log_level: 
+  teem_cert_url: 
+  teem_entitlement_url: 
+  teem_initial_config_url: 
+  licenseserver_root_ca_path: 
+
+  # Device registration API arguments
+  jwt:
+  digital_asset_version: "1.2.0"
+  custom_id: 
+  {{- end }}

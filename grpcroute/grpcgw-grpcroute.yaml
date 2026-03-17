@@ -1,0 +1,40 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: grpc-gw
+  namespace: web
+spec:
+  addresses:
+  - type: "IPAddress"
+    value: 192.168.48.202
+  gatewayClassName: f5-gateway-class
+  listeners:
+  - name: grpc
+    protocol: HTTPS
+    port: 50051
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: local-test-tls-cert
+        namespace: sec-infra
+    allowedRoutes:
+      namespaces:
+        from: "All"
+      kinds:
+      - kind: GRPCRoute 
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GRPCRoute
+metadata:
+  name: grpc-route
+  namespace: web 
+spec:
+  parentRefs:
+  - name: grpc-gw
+    sectionName: grpc 
+  rules:
+  - backendRefs:
+    - name: go-grpc-greeter-server
+      namespace: web 
+      port: 50051

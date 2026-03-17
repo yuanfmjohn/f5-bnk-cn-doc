@@ -1,0 +1,84 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: mirror-gw
+  namespace: web
+spec:
+  addresses:
+  - type: "IPAddress"
+    value: 192.168.48.203
+  gatewayClassName: f5-gateway-class
+  listeners:
+  - name: http-mirror
+    protocol: HTTP
+    port: 80
+    allowedRoutes:
+      namespaces:
+        from: "All"
+      kinds:
+      - kind: HTTPRoute
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-mirror
+  namespace: web
+spec:
+  parentRefs:
+  - name: mirror-gw
+    sectionName: http-mirror
+  rules:
+  - matches:
+    - headers:
+      - name: "Host"
+        value: "www.f5bnk.com"
+    backendRefs:
+    - name: web-nginx-svc
+      namespace: web
+      port: 80
+---
+apiVersion: k8s.f5net.com/v1
+kind: F5SPKPool
+metadata:
+  name: spkpool-mirror
+  namespace: f5-bnk  
+spec:
+  members:
+  - address: 192.168.48.99
+    port: 80
+---
+apiVersion: "k8s.f5net.com/v1"
+kind: F5BigCneIrule
+metadata:
+  name: irule-mirror
+  namespace: web 
+spec:
+  iRule: >
+    when HTTP_REQUEST {
+      HTTP::collect 1
+    }
+
+    when HTTP_REQUEST_DATA {
+      set hsl [HSL::open -proto TCP -pool f5-bnk-pool-spkpool-mirror-pool]
+      set request_data ""
+      set request_data [HTTP::request]
+      set request_data [HTTP::payload]
+      HSL::send $hsl $request_data
+      HTTP::release
+    }
+---
+apiVersion: "gateway.k8s.f5net.com/v1alpha1"
+kind: BNKNetPolicy
+metadata:
+  name: netpolicy-mirror
+  namespace: web 
+spec:
+  extensionRefs:
+  - kind: F5BigCneIrule
+    name: irule-mirror
+    group: k8s.f5net.com
+  targetRefs:
+  - kind: Gateway
+    name: mirror-gw
+    group: gateway.networking.k8s.io
+    sectionName: http-mirror

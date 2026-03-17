@@ -1,0 +1,76 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: httproute-default-gw
+  namespace: web
+spec:
+  addresses:
+  - type: "IPAddress"
+    value: 192.168.48.202
+  gatewayClassName: f5-gateway-class
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+    allowedRoutes:
+      namespaces:
+        from: "All"
+      kinds:
+      - kind: HTTPRoute
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: coffee-route
+  namespace: web
+spec:
+  parentRefs:
+  - name: httproute-default-gw
+  hostnames:
+  - "coffee.f5bnk.com"
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /login
+    backendRefs:
+    - name: coffee-svc
+      port: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: tea-route
+  namespace: web
+spec:
+  parentRefs:
+  - name: httproute-default-gw
+  hostnames:
+  - "tea.f5bnk.com"
+  rules:
+  - matches:
+    - headers:
+      - type: Exact
+        name: env
+        value: canary
+    backendRefs:
+    - name: httpbin
+      port: 8080
+  - backendRefs:
+    - name: tea-svc
+      port: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: default-route
+  namespace: web
+spec:
+  parentRefs:
+  - name: httproute-default-gw
+  hostnames:
+  - "*.f5bnk.com"
+  rules:
+  - backendRefs:
+    - name: httpbin
+      port: 8080

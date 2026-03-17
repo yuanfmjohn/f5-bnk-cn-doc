@@ -1,0 +1,159 @@
+
+
+global:
+  certmgr:
+    # Components managed by f5-lifecycle-operator require usage of cert-manager, either
+    # provided externally or managed by the f5-lifecycle-operator. This is also used
+    # in the CRD installation to decide which variant of cert-manager CRDs
+    # should be installed.
+    external: true
+    # issuerRef must be populated with the required fields. Please refer to cert-manager CRD
+    # clusterIssuer: sample-issuer
+
+  # Reference to one or more secrets to be used when pulling images.
+  # For more information, see [Pull an Image from a Private Registry](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/).
+  #
+  # For example:
+  #  imagePullSecrets:
+  #    - name: "image-pull-secret"
+  imagePullSecrets: []
+
+# This namespace allows you to define where the f5-lifecycle-operator is installed
+# into. It is recommended that this is either a dedicated namespace or
+# one created for other operators to be installed.
+namespace: ""
+
+# The log level for the f5-lifecycle-operator. Defaults to "info". Valid values are:
+# trace, debug, info, notice, warning, error, critical, alert, emergency
+logLevel: "info"
+
+# Rbac create flag indicates whether the f5-lifecycle-operator should create
+# the required rbac resources. If set to false, the user must create the
+# required rbac resources manually.
+rbac:
+  create: true
+
+# envDiscovery's fields dictate what checks occur in the node jobs of envDiscovery
+# made by this FLO, if the BNKGC applied has envDiscovery enabled
+envDiscovery:
+  # General checks
+  disableGenerics: false
+  
+  # Host Node specific checks
+  disableAnnotations: false
+  disableVFs: false
+
+  # DPU Node specific checks
+  disableHugepages: false
+  disableSFConfig: false
+  disableServerConfig: false
+  disableTaints: false
+  disableLables: false
+
+image:
+  # The container image location for the F5 Lifecycle Operator.
+  repository: repo.f5.com/images
+
+  # The container image name for the F5 Lifecycle Operator.
+  name: f5-lifecycle-operator
+
+  # Override the image tag to deploy by setting this variable.
+  # If no value is set, the chart's appVersion is used.
+  # tag: vX.Y.Z
+
+  # Kubernetes imagePullPolicy on Deployment.
+  pullPolicy: IfNotPresent
+
+fluentbit_sidecar:
+  # Enable/Disable sidecar
+  enabled: true
+  name: fluentbit
+  # Image container definition
+  image:
+      # The image repository for the fluentbit sidecar container. If this is
+      # left blank, the repository for the main f5-lifecycle-operator will be
+      # used.
+      # repository: repo.f5.com/images
+      name: f5-fluentbit
+      tag: v1.2.8-0.0.5
+      pullPolicy: IfNotPresent
+  fluentbit:
+    # Interval to flush output (seconds)
+    flush_interval: 1
+    # Error/warning/info/debug/trace
+    debug: true
+    logLevel: info
+    # Pipe reading parameters
+    input:
+      pipes:
+        bufSize: 8096
+        intervalSec: 1
+        intervalNsec: 0
+    tls:
+      enabled: true
+      # TLS debug verbosity level, values: 0 (No debug), 1 (Error), 2 (State change), 3 (Informational) and 4 (Verbose)
+      debug: 1
+      # Force certificate validation
+      verify: Off
+      # key string known by the remote Fluentd used for authorization.
+      shared_key: f5-toda-shared-key
+  fluentd:
+    host: "f5-toda-fluentd.f5-utils.svc.cluster.local."
+    port: 54321
+  resources:
+    # User can adjust the resources as necessary for this container
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 300m
+      memory: 512Mi
+
+serviceAccount:
+  create: true
+
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname
+  # template.
+  # name: ""
+
+# Resources to provide to the f5-lifecycle-operator pod.
+#
+# For example:
+#  requests:
+#    cpu: 10m
+#    memory: 32Mi
+#
+# For more information, see [Resource Management for Pods and Containers](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/).
+# Gathered resource metrics for FLO workload, see [F5-Lifecycle-Operator - Resource requests/limits measurement](https://docs.f5net.com/spaces/~christy/pages/1091861572/F5-Lifecycle-Operator+-+Resource+requests+limits+measurement).
+resources:
+  limits:
+    cpu: "0.5"
+    memory: "512Mi"
+  requests:
+    cpu: "0.25"
+    memory: "256Mi"
+
+# For license related configuration
+license:
+  operationMode: "connected"
+  logLevel: "info"
+  # JWT token License used to Activate with the F5 Teem service.
+  #jwt: ""
+  friendlyName: "My Cluster"
+  # The URL to the F5 Teem License service.
+  #teemCertUrl: ""
+  # The URL to the F5 Teem License entitlement service.
+  #teemEntitlementUrl: ""
+  # The URL to the F5 Teem License initial configuration service.
+  #teemInitialConfigUrl: ""
+  kid: "v1"
+  alg: "RS512"
+  kty: "RSA"
+  # Required: from cpcl-key.yaml downloaded from clouddocs.f5.com
+  #modulus: ""
+  exponent: "AQAB"
+  # Required: from cpcl-key.yaml downloaded from clouddocs.f5.com
+  #x5c:
+  use: "sig"
+  licenseserverrootca: null

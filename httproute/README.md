@@ -1,20 +1,20 @@
-## 2. HTTP 라우팅
+## 2. HTTP 路由
 
-### 2.1 기본 HTTP 라우팅
+### 2.1 基础 HTTP 路由
 
-HTTPRoute 리소스를 사용하면 HTTP 트래픽을 매칭하고 Kubernetes 백엔드로 전달할 수 있습니다. 이 가이드는 HTTPRoute가 호스트, 헤더 및 경로 필드에서 트래픽을 매칭하고 다른 Kubernetes Service로 전달하는 방법을 보여줍니다.
+使用 HTTPRoute 资源，您可以匹配 HTTP 流量并将其转发到 Kubernetes 后端。本指南展示了 HTTPRoute 如何在主机、标头和路径字段中匹配流量，并将其转发到不同的 Kubernetes Service。
 
-다음 다이어그램은 세 가지 다른 Service에 걸친 필요한 트래픽 흐름을 설명합니다:
+下图说明了跨三个不同 Service 的所需流量流：
 
-- `foo.example.com/login`으로의 트래픽은 `foo-svc`로 전달됨
-- `env: canary` 헤더가 있는 `bar.example.com/*`으로의 트래픽은 `bar-svc-canary`로 전달됨
-- 헤더가 없는 `bar.example.com/*`으로의 트래픽은 `bar-svc`로 전달됨
+- 发往 `foo.example.com/login` 的流量转发到 `foo-svc`
+- 带有 `env: canary` 标头发往 `bar.example.com/*` 的流量转发到 `bar-svc-canary`
+- 不带标头发往 `bar.example.com/*` 的流量转发到 `bar-svc`
 
 ![HTTP Routing](https://gateway-api.sigs.k8s.io/images/http-routing.png)
 
-점선은 이 라우팅 동작을 구성하기 위해 배포된 Gateway 리소스를 보여줍니다. 동일한 `prod-web` Gateway에 라우팅 규칙을 생성하는 두 개의 HTTPRoute 리소스가 있습니다.
+虚线显示了为配置此路由行为而部署的 Gateway 资源。有两个 HTTPRoute 资源在同一个 `prod-web` Gateway 上创建路由规则。
 
-#### Gateway와 HTTPRoute 예제:
+#### Gateway 与 HTTPRoute 示例：
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -43,11 +43,11 @@ spec:
       port: 80
 ```
 
-#### 호스트명 매칭
+#### 主机名匹配
 
-HTTPRoute는 단일 호스트명 집합과 매칭할 수 있습니다. 이러한 호스트명은 HTTPRoute 내의 다른 매칭보다 먼저 매칭됩니다.
+HTTPRoute 可以匹配单个主机名集。这些主机名会先于 HTTPRoute 内的其他匹配进行匹配。
 
-**foo-route 예제:**
+**foo-route 示例：**
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -69,9 +69,9 @@ spec:
       port: 8080
 ```
 
-이 경로는 `foo.example.com`에 대한 모든 트래픽을 매칭하고 라우팅 규칙을 적용하여 올바른 백엔드로 트래픽을 전달합니다. 하나의 매치만 지정되었으므로 `foo.example.com/login/*` 트래픽만 전달됩니다.
+此路由匹配发往 `foo.example.com` 的所有流量，并应用路由规则将流量转发到正确的后端。由于仅指定了一个匹配项，因此仅转发 `foo.example.com/login/*` 流量。
 
-**bar-route 예제:**
+**bar-route 示例：**
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -97,104 +97,82 @@ spec:
       port: 8080
 ```
 
-`bar-route` HTTPRoute는 `bar.example.com`에 대한 트래픽을 매칭합니다. 이 호스트명에 대한 모든 트래픽은 라우팅 규칙에 대해 평가됩니다. 가장 구체적인 매치가 우선하므로 `env: canary` 헤더가 있는 모든 트래픽은 `bar-svc-canary`로 전달되고, 헤더가 없거나 canary가 아닌 경우 `bar-svc`로 전달됩니다.
+`bar-route` HTTPRoute 匹配发往 `bar.example.com` 的流量。该主机名的所有流量都将针对路由规则进行评估。由于最具体的匹配优先，因此所有带有 `env: canary` 标头的流量都将转发到 `bar-svc-canary`，如果没有该标头或值不是 canary，则转发到 `bar-svc`。
 
 ---
 
-### 2.2 HTTP 리다이렉트 및 리라이트
+### 2.2 HTTP 重定向与重写
 
-HTTPRoute 리소스는 필터를 사용하여 클라이언트에 리다이렉트를 발행하거나 업스트림으로 전송된 경로를 재작성할 수 있습니다.
+HTTPRoute 资源可以使用过滤器向客户端发出重定向，或修改发送到上游的路径。
 
-**참고**: 리다이렉트 및 재작성 필터는 상호 배타적입니다. 규칙은 두 필터 유형을 동시에 사용할 수 없습니다.
+**注意**：重定向和重写过滤器是互斥的。规则不能同时使用这两种过滤器类型。
 
-#### 리다이렉트
+#### 重定向
 
-리다이렉트는 클라이언트에 HTTP 3XX 응답을 반환하여 다른 리소스를 검색하도록 지시합니다.
+重定向向客户端返回 HTTP 3XX 响应，指示其检索其他资源。
 
-##### 지원되는 상태 코드
+##### 支持的状态码
 
-Gateway API는 다음 HTTP 리다이렉트 상태 코드를 지원합니다:
+Gateway API 支持以下 HTTP 重定向状态码：
 
-- **301 (Moved Permanently)**: 리소스가 영구적으로 새 위치로 이동했음을 나타냅니다. HTTP에서 HTTPS로의 영구 업그레이드 또는 영구 URL 변경에 사용합니다.
-- **302 (Found)**: 리소스가 일시적으로 다른 위치에서 사용 가능함을 나타냅니다. 상태 코드를 지정하지 않으면 기본값입니다.
-- **303 (See Other)**: 요청에 대한 응답을 GET 메서드를 사용하여 다른 URL에서 찾을 수 있음을 나타냅니다. POST 요청 후 확인 페이지로 리다이렉트하는 데 일반적으로 사용됩니다.
-- **307 (Temporary Redirect)**: 302와 유사하지만 리다이렉트를 따를 때 HTTP 메서드가 변경되지 않음을 보장합니다.
-- **308 (Permanent Redirect)**: 301과 유사하지만 리다이렉트를 따를 때 HTTP 메서드가 변경되지 않음을 보장합니다.
+- **301 (Moved Permanently)**：表示资源已永久移动到新位置。用于将 HTTP 永久升级为 HTTPS 或永久更改 URL。
+- **302 (Found)**：表示资源临时位于其他位置。如果未指定状态码，则此为默认值。
+- **303 (See Other)**：表示可以使用 GET 方法在另一个 URL 找到对请求的响应。通常用于 POST 请求后重定向到确认页面。
+- **307 (Temporary Redirect)**：类似于 302，但保证在跟随重定向时 HTTP 方法不会改变。
+- **308 (Permanent Redirect)**：类似于 301，但保证在跟随重定向时 HTTP 方法不会改变。
 
-#### HTTP에서 HTTPS로 리다이렉트
+#### 从 HTTP 重定向到 HTTPS
 
-HTTP 트래픽을 HTTPS로 리다이렉트하려면 HTTP와 HTTPS 리스너가 모두 있는 Gateway가 필요합니다.
+要将 HTTP 流量重定向到 HTTPS，需要一个同时具有 HTTP 和 HTTPS 监听器的 Gateway。
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: redirect-gateway
-  namespace: web
 spec:
-  addresses:
-  - type: "IPAddress"
-    value: 192.168.48.202
-  gatewayClassName: f5-gateway-class
+  gatewayClassName: foo-lb
   listeners:
   - name: http
     protocol: HTTP
     port: 80
-    allowedRoutes:
-      namespaces:
-        from: "All"
-      kinds:
-      - kind: HTTPRoute
   - name: https
     protocol: HTTPS
     port: 443
-    allowedRoutes:
-      namespaces:
-        from: "All"
-      kinds:
-      - kind: HTTPRoute
     tls:
       mode: Terminate
       certificateRefs:
-      - name: local-test-tls-cert
-        namespace: sec-infra
-        kind: Secret
-        group: ""
+      - name: redirect-example
 ```
 
-HTTP 리스너에 연결하고 HTTPS로 리다이렉트하는 HTTPRoute가 필요합니다:
+需要一个连接到 HTTP 监听器并重定向到 HTTPS 的 HTTPRoute：
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: http-filter-redirect
-  namespace: web
 spec:
   parentRefs:
   - name: redirect-gateway
     sectionName: http
   hostnames:
-  - www.f5bnk.com
+  - redirect.example
   rules:
   - filters:
     - type: RequestRedirect
       requestRedirect:
         scheme: https
         statusCode: 301
-  - backendRefs:
-    - name: httpbin
-      port: 8080
 ```
 
-또한 HTTPS 트래픽을 애플리케이션 백엔드로 전달하는 HTTPS 리스너에 연결된 HTTPRoute도 필요합니다:
+此外，还需要一个连接到 HTTPS 监听器的 HTTPRoute，用于将 HTTPS 流量转发到应用后端：
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: https-route
-  namespace: web
   labels:
     gateway: redirect-gateway
 spec:
@@ -202,16 +180,16 @@ spec:
   - name: redirect-gateway
     sectionName: https
   hostnames:
-  - www.f5bnk.com
+  - redirect.example
   rules:
   - backendRefs:
-    - name: httpbin
-      port: 8080
+    - name: example-svc
+      port: 80
 ```
 
-#### 경로 리다이렉트
+#### 路径重定向
 
-경로 리다이렉트는 HTTP Path Modifier를 사용하여 전체 경로 또는 경로 접두사를 교체합니다.
+路径重定向使用 HTTP Path Modifier 替换整个路径或路径前缀。
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -235,11 +213,11 @@ spec:
             statusCode: 302
 ```
 
-`https://redirect.example/cayenne/pinch` 및 `https://redirect.example/cayenne/teaspoon`에 대한 요청은 모두 `location: https://redirect.example/paprika`가 포함된 리다이렉트를 받습니다.
+对 `https://redirect.example/cayenne/pinch` 和 `https://redirect.example/cayenne/teaspoon` 的请求都将收到包含 `location: https://redirect.example/paprika` 的重定向。
 
-#### 리라이트
+#### 重写
 
-리라이트는 클라이언트 요청의 구성 요소를 업스트림으로 프록시하기 전에 수정합니다.
+重写在将客户端请求代理到上游之前修改其组件。
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -260,17 +238,17 @@ spec:
           port: 80
 ```
 
-이 HTTPRoute는 `https://rewrite.example/cardamom`에 대한 요청을 수락하고 요청 헤더의 `host: rewrite.example` 대신 `host: elsewhere.example`을 사용하여 업스트림으로 `example-svc`에 전송합니다.
+此 HTTPRoute 接受发往 `https://rewrite.example/cardamom` 的请求，并在发送到上游 `example-svc` 时，将请求标头中的 `host: rewrite.example` 替换为 `host: elsewhere.example`。
 
 ---
 
-### 2.3 HTTP 헤더 수정
+### 2.3 修改 HTTP 标头
 
-HTTP 헤더 수정은 들어오는 요청의 HTTP 헤더를 추가, 제거 또는 수정하는 프로세스입니다.
+修改 HTTP 标头是添加、删除或修改传入请求或传出响应的 HTTP 标头的过程。
 
-#### 요청 헤더 수정
+#### 修改请求标头
 
-**헤더 추가:**
+**添加标头：**
 
 ```yaml
 filters:
@@ -281,7 +259,7 @@ filters:
       value: my-header-value
 ```
 
-**헤더 수정:**
+**修改标头：**
 
 ```yaml
 filters:
@@ -292,7 +270,7 @@ filters:
       value: my-new-header-value
 ```
 
-**헤더 제거:**
+**删除标头：**
 
 ```yaml
 filters:
@@ -301,11 +279,11 @@ filters:
     remove: ["x-request-id"]
 ```
 
-#### 응답 헤더 수정
+#### 修改响应标头
 
-응답 헤더 수정은 요청 헤더 수정과 매우 유사한 구문을 사용하지만 다른 필터(`ResponseHeaderModifier`)를 사용합니다.
+修改响应标头使用与修改请求标头非常相似的语法，但使用不同的过滤器（`ResponseHeaderModifier`）。
 
-**여러 헤더 추가:**
+**添加多个标头：**
 
 ```yaml
 filters:
@@ -322,13 +300,13 @@ filters:
 
 ---
 
-### 2.4 HTTP 트래픽 분산
+### 2.4 HTTP 流量拆分
 
-HTTPRoute 리소스를 사용하면 가중치를 지정하여 다른 백엔드 간에 트래픽을 분산할 수 있습니다. 이는 롤아웃 중 트래픽 분산, 카나리 변경 또는 긴급 상황에 유용합니다.
+使用 HTTPRoute 资源，您可以通过指定权重在不同的后端之间拆分流量。这在滚动更新期间的流量分配、金丝雀发布或紧急情况下非常有用。
 
-#### 기본 트래픽 분산
+#### 基础流量拆分
 
-다음 YAML 스니펫은 두 개의 Service가 단일 경로 규칙의 백엔드로 나열되는 방법을 보여줍니다. 이 경로 규칙은 트래픽을 `coffee-svc`에 90%, `tea-svc`에 10% 분산합니다.
+以下 YAML 片段展示了如何在单个路由规则中列出两个 Service 作为后端。此路由规则将 90% 的流量分配给 `coffee-svc`，10% 分配给 `tea-svc`。
 
 ![Traffic Splitting](https://gateway-api.sigs.k8s.io/images/simple-split.png)
 
@@ -352,13 +330,13 @@ spec:
       weight: 10
 ```
 
-`weight`는 (백분율이 아닌) 트래픽의 비례 분할을 나타내며, 단일 경로 규칙 내의 모든 가중치의 합이 모든 백엔드의 분모가 됩니다.
+`weight` 表示流量的比例拆分（而非百分比），单个路由规则内所有权重的总和将成为所有后端的分母。
 
-#### 카나리 트래픽 롤아웃
+#### 金丝雀流量滚动更新
 
-처음에는 `foo.example.com`에 대한 프로덕션 사용자 트래픽을 제공하는 Service의 단일 버전만 있을 수 있습니다. 다음 HTTPRoute는 `foo-v1` 또는 `foo-v2`에 대해 `weight`가 지정되지 않았으므로 각각의 경로 규칙과 매칭되는 트래픽의 100%를 암시적으로 수신합니다.
+最初，可能只有一个版本的 Service 为 `foo.example.com` 提供生产用户流量。以下 HTTPRoute 由于未为 `foo-v1` 或 `foo-v2` 指定 `weight`，因此它们会隐式接收与其各自路由规则匹配的 100% 流量。
 
-카나리 경로 규칙(헤더 `traffic=test` 매칭)은 프로덕션 사용자 트래픽을 `foo-v2`로 분산하기 전에 합성 테스트 트래픽을 전송하는 데 사용됩니다.
+金丝雀路由规则（匹配标头 `traffic=test`）用于在将生产用户流量拆分到 `foo-v2` 之前发送合成测试流量。
 
 ![Traffic Splitting 1](https://gateway-api.sigs.k8s.io/images/traffic-splitting-1.png)
 
@@ -385,9 +363,9 @@ spec:
       port: 8080
 ```
 
-#### 블루-그린 트래픽 롤아웃
+#### 蓝绿流量滚动更新
 
-내부 테스트가 `foo-v2`로부터 성공적인 응답을 검증한 후, 점진적이고 더 현실적인 테스트를 위해 트래픽의 작은 비율을 새 Service로 전환하는 것이 바람직합니다. 다음 HTTPRoute는 `foo-v2`를 가중치와 함께 백엔드로 추가합니다.
+在内部测试验证了来自 `foo-v2` 的成功响应后，通常希望将一小部分流量切换到新 Service，以便进行逐步且更真实的测试。以下 HTTPRoute 将 `foo-v2` 作为带有权重的后端添加。
 
 ![Traffic Splitting 2](https://gateway-api.sigs.k8s.io/images/traffic-splitting-2.png)
 
@@ -411,9 +389,9 @@ spec:
       weight: 10
 ```
 
-#### 롤아웃 완료
+#### 完成滚动更新
 
-마지막으로 모든 신호가 긍정적이면 트래픽을 `foo-v2`로 완전히 전환하고 롤아웃을 완료할 시간입니다. `foo-v1`의 가중치를 `0`으로 설정하여 트래픽을 받지 않도록 구성합니다.
+最后，如果所有信号都正常，就到了将流量完全切换到 `foo-v2` 并完成滚动更新的时候了。通过将 `foo-v1` 的权重设置为 `0`，配置其不再接收流量。
 
 ![Traffic Splitting 3](https://gateway-api.sigs.k8s.io/images/traffic-splitting-3.png)
 
@@ -437,15 +415,15 @@ spec:
       weight: 1
 ```
 
-이 시점에서 트래픽의 100%가 `foo-v2`로 라우팅되고 롤아웃이 완료됩니다. 어떤 이유로든 `foo-v2`에 오류가 발생하면 가중치를 업데이트하여 트래픽을 `foo-v1`로 빠르게 다시 전환할 수 있습니다.
+此时，100% 的流量都路由到了 `foo-v2`，滚动更新完成。如果由于某种原因 `foo-v2` 出现错误，可以通过更新权重快速将流量切回 `foo-v1`。
 
 ---
 
-### 2.5 HTTP 쿼리 파라미터 매칭
+### 2.5 HTTP 查询参数匹配
 
-HTTPRoute 리소스는 쿼리 파라미터를 기반으로 요청을 매칭하는 데 사용할 수 있습니다.
+HTTPRoute 资源可用于根据查询参数匹配请求。
 
-다음 HTTPRoute는 `animal` 쿼리 파라미터의 값을 기반으로 두 백엔드 간에 트래픽을 분산합니다:
+以下 HTTPRoute 根据 `animal` 查询参数的值在两个后端之间拆分流量：
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -473,12 +451,12 @@ spec:
       port: 8080
 ```
 
-- 쿼리 파라미터 `animal=whale`이 있는 `/`에 대한 요청은 `infra-backend-v1`로 라우팅됩니다.
-- 쿼리 파라미터 `animal=dolphin`이 있는 `/`에 대한 요청은 `infra-backend-v2`로 라우팅됩니다.
+- 带有查询参数 `animal=whale` 的对 `/` 的请求将路由到 `infra-backend-v1`。
+- 带有查询参数 `animal=dolphin` 的对 `/` 的请求将路由到 `infra-backend-v2`。
 
-#### 여러 쿼리 파라미터 매칭
+#### 匹配多个查询参数
 
-규칙은 여러 쿼리 파라미터와도 매칭할 수 있습니다:
+规则也可以匹配多个查询参数：
 
 ```yaml
 - matches:
@@ -492,15 +470,15 @@ spec:
     port: 8080
 ```
 
-쿼리 파라미터 `animal=dolphin` AND `color=blue`가 있으면 `infra-backend-v3`로 트래픽이 라우팅됩니다.
+如果同时存在查询参数 `animal=dolphin` AND `color=blue`，流量将路由到 `infra-backend-v3`。
 
 ---
 
-### 2.6 HTTP 메소드 매칭
+### 2.6 HTTP 方法匹配
 
-HTTPRoute 리소스는 HTTP 메소드를 기반으로 요청을 매칭하는 데 사용할 수 있습니다.
+HTTPRoute 资源可用于根据 HTTP 方法匹配请求。
 
-다음 HTTPRoute는 요청의 HTTP 메소드를 기반으로 두 백엔드 간에 트래픽을 분산합니다:
+以下 HTTPRoute 根据请求的 HTTP 方法在两个后端之间拆分流量：
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -524,16 +502,16 @@ spec:
       port: 8080
 ```
 
-- `/`에 대한 POST 요청은 `infra-backend-v1`로 라우팅됩니다.
-- `/`에 대한 GET 요청은 `infra-backend-v2`로 라우팅됩니다.
+- 对 `/` 的 POST 请求将路由到 `infra-backend-v1`。
+- 对 `/` 的 GET 请求将路由到 `infra-backend-v2`。
 
-#### 다른 매치 유형과의 조합
+#### 与其他匹配类型组合
 
-메소드 매칭은 경로 및 헤더 매칭과 같은 다른 매치 유형과 결합될 수 있습니다:
+方法匹配可以与路径和标头匹配等其他匹配类型结合使用：
 
 ```yaml
 rules:
-# 코어 매치 유형과의 조합
+# 与核心匹配类型组合
 - matches:
   - path:
       type: PathPrefix

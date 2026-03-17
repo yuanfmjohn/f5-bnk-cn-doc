@@ -1,49 +1,49 @@
-# F5 BIG-IP Next for Kubernetes (BNK) 랩 가이드
-## 전체 모듈 상세 가이드 (한국어)
+# F5 BIG-IP Next for Kubernetes (BNK) 实验指南
+## 全模块详细指南 (中文)
 
-> **원문 출처**: F5 BIG-IP Next Training Lab  
-> **버전**: Latest  
-> **번역 및 정리**: 2024년 12월
-
----
-
-## 📚 목차
-
-### [모듈 1: 랩 환경 소개](#모듈-1-랩-환경-소개)
-- [Kubernetes 클러스터 배포](#1-1-kubernetes-클러스터-배포)
-- [Kubernetes 네트워킹 모델](#1-2-kubernetes-네트워킹-모델)
-- [네트워크 플러그인 배포](#1-3-네트워크-플러그인-배포)
-- [가상 머신에 랩 네트워크 생성](#1-4-가상-머신에-랩-네트워크-생성)
-- [BIG-IP Next 네트워크 옵션](#1-5-big-ip-next-네트워크-옵션)
-- [라우터 및 클라이언트 컨테이너 생성](#1-6-라우터-및-클라이언트-컨테이너-생성)
-
-### [모듈 2: BIG-IP Next for Kubernetes 설치](#모듈-2-big-ip-next-for-kubernetes-설치)
-- [커뮤니티 서비스 및 리소스 설치](#2-1-커뮤니티-서비스-및-리소스-설치)
-- [F5 유틸리티 클러스터 테넌트 추가](#2-2-f5-유틸리티-클러스터-테넌트-추가)
-- [FAR 접근 활성화](#2-3-far-접근-활성화)
-- [BIG-IP Next 디버그 서비스 접근 활성화](#2-4-big-ip-next-디버그-서비스-접근-활성화)
-- [BIG-IP Next for Kubernetes 배포 설치](#2-5-big-ip-next-for-kubernetes-배포-설치)
-- [NVIDIA DPU 노드의 BIG-IP Next](#2-6-nvidia-dpu-노드의-big-ip-next)
-- [Ingress 및 Egress용 Kubernetes 테넌트 네트워크 생성](#2-7-ingress-및-egress용-kubernetes-테넌트-네트워크-생성)
-
-### [모듈 3: BIG-IP Next for Kubernetes 사용](#모듈-3-big-ip-next-for-kubernetes-사용)
-- [Red 테넌트 Deployment 및 Service 생성](#3-1-red-테넌트-deployment-및-service-생성)
-- [Ingress GatewayType, Gateway, TCPRoute 생성](#3-2-ingress-gatewaytype-gateway-tcproute-생성)
-- [BIG-IP Next for Kubernetes Ingress 테스트](#3-3-big-ip-next-for-kubernetes-ingress-테스트)
-- [Red 테넌트 컨테이너에서 Egress 확인](#3-4-red-테넌트-컨테이너에서-egress-확인)
-- [Grafana를 통한 BIG-IP Next 텔레메트리 탐색](#3-5-grafana를-통한-big-ip-next-텔레메트리-탐색)
+> **原文出处**: F5 BIG-IP Next Training Lab  
+> **版本**: Latest  
+> **翻译与整理**: 2024年 12月
 
 ---
 
-# 모듈 1: 랩 환경 소개
+## 📚 目录
 
-## 개요
+### [模块 1: 实验环境介绍](#模块-1-实验环境介绍)
+- [Kubernetes 集群部署](#1-1-kubernetes-集群部署)
+- [Kubernetes 网络模型](#1-2-kubernetes-网络模型)
+- [网络插件部署](#1-3-网络插件部署)
+- [在虚拟机上创建实验网络](#1-4-在虚拟机上创建实验网络)
+- [BIG-IP Next 网络选项](#1-5-big-ip-next-网络选项)
+- [创建路由器和客户端容器](#1-6-路由器及客户端容器创建)
 
-본 랩에서는 UDF (Unified Demo Framework)를 활용하여 Kubernetes 환경을 설정합니다.
+### [模块 2: 安装 BIG-IP Next for Kubernetes](#模块-2-安装-big-ip-next-for-kubernetes)
+- [安装社区服务及资源](#2-1-社区服务及资源安装)
+- [添加 F5 实用工具集群租户](#2-2-f5-实用工具集群租户添加)
+- [启用 FAR 访问](#2-3-far-访问启用)
+- [启用 BIG-IP Next 调试服务访问](#2-4-big-ip-next-调试服务访问启用)
+- [安装 BIG-IP Next for Kubernetes 部署](#2-5-big-ip-next-for-kubernetes-部署安装)
+- [NVIDIA DPU 节点上的 BIG-IP Next](#2-6-nvidia-dpu-节点上的-big-ip-next)
+- [创建用于 Ingress 和 Egress 的 Kubernetes 租户网络](#2-7-创建用于-ingress-及-egress-的-kubernetes-租户网络)
 
-BIG-IP Next for Kubernetes는 모듈식으로 다양한 규모로 배포할 수 있습니다. 본 랩 개발 환경에서는 KinD (Kubernetes in Docker)를 활용하여 단일 가상 머신에 Kubernetes 클러스터를 구축합니다.
+### [模块 3: 使用 BIG-IP Next for Kubernetes](#模块-3-使用-big-ip-next-for-kubernetes)
+- [创建 Red 租户 Deployment 和 Service](#3-1-red-租户-deployment-及-service-创建)
+- [创建 Ingress GatewayType, Gateway, TCPRoute](#3-2-ingress-gatewaytype-gateway-tcproute-创建)
+- [测试 BIG-IP Next for Kubernetes Ingress](#3-3-big-ip-next-for-kubernetes-ingress-测试)
+- [在 Red 租户容器中确认 Egress](#3-4-在-red-租户容器中确认-egress)
+- [通过 Grafana 探索 BIG-IP Next 遥测数据](#3-5-通过-grafana-探索-big-ip-next-遥测数据)
 
-### 최종 랩 네트워크 다이어그램
+---
+
+# 模块 1: 实验环境介绍
+
+## 概览
+
+在本实验中，我们将利用 UDF (Unified Demo Framework) 设置 Kubernetes 环境。
+
+BIG-IP Next for Kubernetes 是模块化的，可以根据不同规模进行部署。在本实验开发环境中，我们利用 KinD (Kubernetes in Docker) 在单个虚拟机上构建 Kubernetes 集群。
+
+### 最终实验网络拓扑图
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -74,30 +74,30 @@ BIG-IP Next for Kubernetes는 모듈식으로 다양한 규모로 배포할 수 
 │  └──────────────┘                                                │
 │                                                                   │
 │  Networks:                                                        │
-│  • kind (bridge)           - Kubernetes 노드 연결                │
+│  • kind (bridge)           - Kubernetes 节点连接                │
 │  • external-net (macvlan)  - Ingress Virtual Servers             │
 │  • egress-net (macvlan)    - Egress SNAT                         │
-│  • infra_client-net        - Client 네트워크                     │
+│  • infra_client-net        - Client 网络                     │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 1-1. Kubernetes 클러스터 배포
+## 1-1. Kubernetes 集群部署
 
-### 초기 환경 확인
+### 初始环境确认
 
-랩 웹 콘솔 UI에 로그인한 후, **ubuntu** 사용자로 전환합니다.
+登录实验 Web 控制台 UI 后，切换到 **ubuntu** 用户。
 
 ```bash
-# ubuntu 사용자로 전환
+# 切换到 ubuntu 用户
 su -l ubuntu
 
-# Docker 네트워크 확인
+# 确认 Docker 网络
 docker network ls
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 NETWORK ID     NAME      DRIVER    SCOPE
 938d048cb58f   bridge    bridge    local
@@ -105,48 +105,48 @@ a7e18706eb7a   host      host      local
 3ac8b0046fd9   none      null      local
 ```
 
-현재는 Docker 기본 네트워크만 존재합니다:
-- **bridge**: 분리된 호스트 네트워크
-- **host**: 호스트의 기존 네트워크 인터페이스에 직접 연결
-- **none**: 네트워킹 없음
+目前仅存在 Docker 默认网络:
+- **bridge**: 隔离的宿主机网络
+- **host**: 直接连接到宿主机的现有网络接口
+- **none**: 无网络
 
-### KinD (Kubernetes in Docker) 소개
+### KinD (Kubernetes in Docker) 介绍
 
-**KinD란?**
-- Kubernetes in Docker의 약자
-- Docker 컨테이너를 "노드"로 사용하여 로컬 Kubernetes 클러스터를 실행하는 도구
-- 개발, 테스트, CI 환경에 특히 유용
+**什么是 KinD?**
+- Kubernetes in Docker 的缩写
+- 使用 Docker 容器作为“节点”来运行本地 Kubernetes 集群的工具
+- 对开发、测试、CI 环境特别有用
 
-**추가 정보:**
-- [KinD 공식 사이트](https://kind.sigs.k8s.io/)
-- [Kubectl 공식 문서](https://kubernetes.io/docs/reference/kubectl/)
-- [Helm 공식 사이트](https://helm.sh/)
+**更多信息:**
+- [KinD 官方网站](https://kind.sigs.k8s.io/)
+- [Kubectl 官方文档](https://kubernetes.io/docs/reference/kubectl/)
+- [Helm 官方网站](https://helm.sh/)
 
-### Kubernetes 클러스터 생성
+### 创建 Kubernetes 集群
 
 ```bash
-# 현재 실행 중인 컨테이너 확인 (없어야 정상)
+# 确认当前正在运行的容器 (正常情况下应为空)
 docker ps
 
-# Kubernetes 클러스터 생성
+# 创建 Kubernetes 集群
 ./create-cluster.sh
 ```
 
-**스크립트 동작:**
-1. KinD 노드 컨테이너 이미지 다운로드
-2. 4개의 컨테이너 실행 및 Kubernetes 클러스터 구성
+**脚本操作:**
+1. 下载 KinD 节点容器镜像
+2. 运行 4 个容器并配置 Kubernetes 集群
 
-**생성된 컨테이너 확인:**
+**确认生成的容器:**
 
 ```bash
-# 컨테이너 목록 확인
+# 确认容器列表
 docker ps
 
-# Kubernetes 노드 확인
+# 确认 Kubernetes 节点
 kubectl get nodes
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 NAME                STATUS     ROLES           AGE     VERSION
 bnk-control-plane   NotReady   control-plane   9m46s   v1.32.0
@@ -155,91 +155,91 @@ bnk-worker2         NotReady   <none>          9m35s   v1.32.0
 bnk-worker3         NotReady   <none>          9m35s   v1.32.0
 ```
 
-**노드가 NotReady 상태인 이유:**
-아직 CNI (Container Network Interface) 플러그인이 설치되지 않았기 때문입니다.
+**节点处于 NotReady 状态的原因:**
+因为尚未安装 CNI (Container Network Interface) 插件。
 
 ---
 
-## 1-2. Kubernetes 네트워킹 모델
+## 1-2. Kubernetes 网络模型
 
-### Kubernetes 네트워킹 개념
+### Kubernetes 网络概念
 
-Kubernetes 네트워킹은 컨테이너를 'Pod' 내에 고도로 민첩하게 배포할 수 있도록 설계되었습니다.
+Kubernetes 网络旨在让容器能够高度敏捷地部署在 'Pod' 内。
 
-**핵심 원칙:**
-- 각 Pod는 고유한 IP 주소를 가짐
-- 동일 클러스터의 모든 Pod는 서로 직접 통신 가능
-- Service는 정적 IP를 할당하고 Endpoint로 로드밸런싱
+**核心原则:**
+- 每个 Pod 都有唯一的 IP 地址
+- 同一集群的所有 Pod 都可以直接相互通信
+- Service 分配静态 IP 并通过 Endpoint 进行负载均衡
 
-### Kubernetes Service 타입
+### Kubernetes Service 类型
 
 1. **ClusterIP**
-   - 클러스터 전체에서 접근 가능한 서비스 IP 및 포트
-   - [공식 문서](https://kubernetes.io/docs/concepts/services-networking/service/#type-clusterip)
+   - 在整个集群内可访问的服务 IP 和端口
+   - [官方文档](https://kubernetes.io/docs/concepts/services-networking/service/#type-clusterip)
 
 2. **NodePort**
-   - Kubernetes 노드 IP 주소와 포트로 데이터 센터에서 접근 가능
-   - [공식 문서](https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport)
+   - 可通过 Kubernetes 节点 IP 地址和端口从数据中心访问
+   - [官方文档](https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport)
 
 3. **LoadBalancer**
-   - 외부에서 접근 가능한 L4 로드밸런싱 서비스
-   - 내부 클러스터 서비스로 트래픽 전달
-   - [공식 문서](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer)
+   - 可从外部访问的 L4 负载均衡服务
+   - 将流量转发到内部集群服务
+   - [官方文档](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer)
 
 4. **Ingress**
-   - 외부에서 접근 가능한 L7 HTTP 기반 로드밸런싱
-   - [공식 문서](https://kubernetes.io/docs/concepts/services-networking/ingress/)
+   - 可从外部访问的 L7 基于 HTTP 的负载均衡
+   - [官方文档](https://kubernetes.io/docs/concepts/services-networking/ingress/)
 
 5. **Gateway** (NEW!)
-   - CNCF 표준 서비스
-   - NetOps 인프라 관리자가 리스너 정의
-   - DevOps 애플리케이션 관리자가 라우트 정의
-   - 지원 라우트:
+   - CNCF 标准服务
+   - NetOps 基础设施管理员定义监听器 (Listener)
+   - DevOps 应用管理员定义路由 (Route)
+   - 支持路由:
      - L4: **TCPRoute**, **UDPRoute**
      - L6: **TLSRoute**
      - L7: **HTTPRoute** (HTTP/1.0, HTTP/2.0, gRPC)
-   - 커스텀 라우트로 확장 가능
-   - [공식 문서](https://kubernetes.io/docs/concepts/services-networking/gateway/)
+   - 可通过自定义路由进行扩展
+   - [官方文档](https://kubernetes.io/docs/concepts/services-networking/gateway/)
 
 ---
 
-## 1-3. 네트워크 플러그인 배포
+## 1-3. 网络插件部署
 
-### CNI (Container Network Interface) 플러그인
+### CNI (Container Network Interface) 插件
 
-**CNI란?**
-- Pod에 네트워크 인터페이스 생성 및 IP 주소 할당을 담당
-- Kubernetes가 Pod를 스케줄링하면 CNI가 네트워크 연결 생성
+**什么是 CNI?**
+- 负责在 Pod 中创建网络接口并分配 IP 地址
+- 当 Kubernetes 调度 Pod 时，CNI 会创建网络连接
 
-[CNI 공식 사이트](https://www.cni.dev/)
+[CNI 官方网站](https://www.cni.dev/)
 
-### Calico CNI 설치
+### 安装 Calico CNI
 
-**Calico란?**
-- 널리 사용되는 네트워크 플러그인
-- 컨테이너 스케줄링 시 네트워크 인터페이스 및 IP 주소 제공
-- [Calico 공식 문서](https://docs.tigera.io/calico/latest/about)
+**什么是 Calico?**
+- 广泛使用的网络插件
+- 在容器调度时提供网络接口和 IP 地址
+- [Calico 官方文档](https://docs.tigera.io/calico/latest/about)
 
-**기본 동작:**
-- Pod는 기본적으로 하나의 네트워크 인터페이스(**eth0**)와 하나의 Pod 네트워크 IP 주소를 가짐
+**基本操作:**
+- Pod 默认拥有一个网络接口 (**eth0**) 和一个 Pod 网络 IP 地址
 
-### Multus CNI 설치
+### 安装 Multus CNI
 
-**Multus란?**
-- Kubernetes Pod에 추가 네트워크 인터페이스 생성을 제어
-- **NetworkAttachmentDefinition** 리소스를 통해 추상화
-- BIG-IP 프록시와 같은 트래픽 처리용 추가 인터페이스에 필요
+**什么是 Multus?**
+- 控制在 Kubernetes Pod 中创建额外的网络接口
+- 通过 **NetworkAttachmentDefinition** 资源进行抽象
+- 像 BIG-IP 代理这类用于流量处理的额外接口需要它
 
-[Multus 공식 GitHub](https://github.com/k8snetworkplumbingwg/multus-cni/blob/master/README.md)
+[Multus 官方 GitHub](https://github.com/k8snetworkplumbingwg/multus-cni/blob/master/README.md)
 
-### CNI 및 Multus 배포
+### 部署 CNI 和 Multus
 
 ```bash
-# CNI 및 Multus 배포
+# 部署 CNI 和 Multus
 ./deploy-cni.sh
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 Create CNI and Multus ...
 poddisruptionbudget.policy/calico-kube-controllers created
@@ -258,13 +258,13 @@ daemonset.apps/install-cni-plugins created
 Waiting for Kubernetes control plane to get ready ...
 ```
 
-### 노드 상태 재확인
+### 再次确认节点状态
 
 ```bash
 kubectl get nodes
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 NAME                STATUS   ROLES           AGE   VERSION
 bnk-control-plane   Ready    control-plane   54m   v1.32.0
@@ -273,52 +273,52 @@ bnk-worker2         Ready    <none>          54m   v1.32.0
 bnk-worker3         Ready    <none>          54m   v1.32.0
 ```
 
-이제 모든 노드가 **Ready** 상태입니다!
+现在所有节点都处于 **Ready** 状态了！
 
-### Pod 목록 확인
+### 确认 Pod 列表
 
 ```bash
 kubectl get pods -A
 ```
 
-**주요 Pod:**
-- **calico-kube-controllers**: 클러스터용 Calico 컨트롤러 (1개)
-- **calico-node**: 각 노드의 Calico 에이전트 (DaemonSet)
-- **kube-multus-ds**: 각 노드의 Multus (DaemonSet)
+**核心 Pod:**
+- **calico-kube-controllers**: 集群用 Calico 控制器 (1个)
+- **calico-node**: 每个节点的 Calico 代理 (DaemonSet)
+- **kube-multus-ds**: 每个节点的 Multus (DaemonSet)
 
-### Docker 네트워크 재확인
+### 再次确认 Docker 网络
 
 ```bash
 docker network ls
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 NETWORK ID     NAME      DRIVER    SCOPE
 938d048cb58f   bridge    bridge    local
 a7e18706eb7a   host      host      local
-01c75852c676   kind      bridge    local  ← KinD가 추가한 네트워크
+01c75852c676   kind      bridge    local  ← KinD 添加的网络
 3ac8b0046fd9   none      null      local
 ```
 
 ---
 
-## 1-4. 가상 머신에 랩 네트워크 생성
+## 1-4. 在虚拟机上创建实验网络
 
-### 필요한 네트워크
+### 所需网络
 
-현재 Docker에는 KinD 클러스터용 **kind** 네트워크만 있습니다. 추가로 다음 네트워크를 생성해야 합니다:
-- **infra_client-net**: 클라이언트 네트워크
-- **external-net**: BIG-IP Ingress Virtual Server용 MACVLAN
-- **egress-net**: BIG-IP Egress SNAT용 MACVLAN
+目前 Docker 中只有 KinD 集群使用的 **kind** 网络。此外还需要创建以下网络:
+- **infra_client-net**: 客户端网络
+- **external-net**: 用于 BIG-IP Ingress Virtual Server 的 MACVLAN
+- **egress-net**: 用于 BIG-IP Egress SNAT 的 MACVLAN
 
-### 랩 네트워크 생성
+### 创建实验网络
 
 ```bash
 ./create-lab-networks.sh
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 Creating docker networks external-net and egress-net and attach both to worker nodes ...
 9fbe21d0d55bddd34a04dc41aa5261961e4780046729c515609b0d7d5fb4c28e
@@ -329,18 +329,18 @@ node/bnk-worker3 annotated
 Flush IP on eth1 in each worker node, the node won't use it, only TMM will
 ```
 
-**생성된 네트워크:**
-- **infra_client-net** (bridge): 클라이언트용
-- **external-net** (macvlan): Ingress Virtual Server용
-- **egress-net** (macvlan): Egress SNAT용
+**生成的网络:**
+- **infra_client-net** (bridge): 客户端用
+- **external-net** (macvlan): Ingress Virtual Server 用
+- **egress-net** (macvlan): Egress SNAT 用
 
-### 네트워크 목록 확인
+### 确认网络列表
 
 ```bash
 docker network ls
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 NETWORK ID     NAME               DRIVER    SCOPE
 a749e9e46e78   bridge             bridge    local
@@ -352,11 +352,11 @@ c23770001ba1   kind               bridge    local
 3ac8b0046fd9   none               null      local
 ```
 
-### Multus NetworkAttachmentDefinition 생성
+### 创建 Multus NetworkAttachmentDefinition
 
-Multus **NetworkAttachmentDefinition**은 BIG-IP Pod가 추가 네트워크 인터페이스에 연결하는 방법을 정의합니다.
+Multus **NetworkAttachmentDefinition** 定义了 BIG-IP Pod 如何连接到额外的网络接口。
 
-**외부 네트워크 정의 (resources/networks.yaml):**
+**外部网络定义 (resources/networks.yaml):**
 
 ```yaml
 apiVersion: "k8s.cni.cncf.io/v1"
@@ -373,7 +373,7 @@ spec:
     }'
 ```
 
-**Egress 네트워크 정의:**
+**Egress 网络定义:**
 
 ```yaml
 apiVersion: k8s.cni.cncf.io/v1
@@ -390,13 +390,13 @@ spec:
     }'
 ```
 
-### Network Attachment 생성
+### 创建 Network Attachment
 
 ```bash
 ./create-bigip-network-attachements.sh
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 Create Multus Network Attachments ...
 networkattachmentdefinition.k8s.cni.cncf.io/external-net created
@@ -407,27 +407,27 @@ egress-net     0s
 external-net   0s
 ```
 
-**네트워크 인터페이스 매핑:**
-- Calico가 **eth0** 생성 (표준 Pod 네트워크)
-- Multus가 **eth1** 생성 (external-net)
-- Multus가 **eth2** 생성 (egress-net)
+**网络接口映射:**
+- Calico 创建 **eth0** (标准 Pod 网络)
+- Multus 创建 **eth1** (external-net)
+- Multus 创建 **eth2** (egress-net)
 
 ---
 
-## 1-5. BIG-IP Next 네트워크 옵션
+## 1-5. BIG-IP Next 网络选项
 
-BIG-IP Next for Kubernetes는 여러 방식으로 연결할 수 있습니다.
+BIG-IP Next for Kubernetes 可以通过多种方式进行连接。
 
-### 옵션 1: DPU에서 완전한 호스트 오프로드
+### 选项 1: 在 DPU 上实现完全的宿主机卸载 (Offload)
 
-**NVIDIA BlueField-3 DPU 사용:**
-- DPU는 독립적인 SoC (System on a Chip) 프로세서
-- 자체 네트워크 연결 옵션 보유
-- NVIDIA DOCA 네트워크 가속 API 사용
-- F5의 NVIDIA BlueField-3 통합은 DOCA 'scalable functions'를 통해 DPU의 하드웨어 eSwitch에 직접 연결
-- 각 DPU의 BIG-IP가 호스트의 모든 워크로드 트래픽 처리
+**使用 NVIDIA BlueField-3 DPU:**
+- DPU 是独立的 SoC (System on a Chip) 处理器
+- 拥有自己的网络连接选项
+- 使用 NVIDIA DOCA 网络加速 API
+- F5 与 NVIDIA BlueField-3 的集成通过 DOCA 'scalable functions' 直接连接到 DPU 的硬件 eSwitch
+- 每个 DPU 上的 BIG-IP 处理宿主机的所有工作负载流量
 
-**아키텍처:**
+**架构:**
 ```
 ┌────────────────────────────────────┐
 │         Host Node                   │
@@ -450,21 +450,21 @@ BIG-IP Next for Kubernetes는 여러 방식으로 연결할 수 있습니다.
 └────────────────────────────────────┘
 ```
 
-[전체 설치 가이드](https://f5devcentral.github.io/f5-bnk-nvidia-bf3-installations/)
+[完整安装指南](https://f5devcentral.github.io/f5-bnk-nvidia-bf3-installations/)
 
-### 옵션 2: DPDK로 호스트 시스템에서 실행
+### 选项 2: 使用 DPDK 在宿主机系统运行
 
 **DPDK (Data Plane Development Kit):**
-- 사용자 프로세스(실행 단위)용 가속 네트워크 액세스 표준
-- 네트워크 장치, 컴퓨팅 코어 및 메모리를 사전 할당
-- 전용 네트워크 인터페이스 큐의 데이터 폴링으로 액세스
-- 호스트 커널을 인터럽트 핸들러에서 오프로드
-- 네트워크 처리 속도 향상 및 지연 시간 감소
+- 用于用户态进程 (执行单元) 的加速网络访问标准
+- 预分配网络设备、计算核心和内存
+- 通过对专用网络接口队列的数据轮询进行访问
+- 将宿主机内核从中断处理程序中卸载
+- 提高网络处理速度并降低延迟
 
-**BIG-IP Next 데이터 플레인:**
-- DPDK 네트워크 인터페이스 드라이버부터 HTTP 같은 전체 애플리케이션 프로토콜까지 완전한 프록시 스택
+**BIG-IP Next 数据平面:**
+- 从 DPDK 网络接口驱动到 HTTP 等完整应用协议的完整代理堆栈
 
-**아키텍처:**
+**架构:**
 ```
 ┌────────────────────────────────────┐
 │         Host System                 │
@@ -484,20 +484,20 @@ BIG-IP Next for Kubernetes는 여러 방식으로 연결할 수 있습니다.
 └────────────────────────────────────┘
 ```
 
-### 옵션 3: 호스트 Linux 커널 네트워킹을 통한 연결
+### 选项 3: 通过宿主机 Linux 内核网络连接
 
-**Linux 네트워킹:**
-- 다양한 가상 네트워크 디바이스 및 소켓 API 레이어
-- BIG-IP Next는 'raw sockets' 사용 가능
-- 네트워크 인터페이스를 호스트와 완전히 공유
-- 전용 네트워크 인터페이스 및 컴퓨팅 리소스와 비교 시 성능 및 지연 시간 저하
+**Linux 网络:**
+- 各种虚拟网络设备和套接字 API 层
+- BIG-IP Next 可以使用 'raw sockets'
+- 与宿主机完全共享网络接口
+- 与专用网络接口和计算资源相比，性能较低且延迟较高
 
-**테스트 환경용 MACVLAN:**
-- 가상 머신과 유사한 방식의 가상 네트워킹 인터페이스
-- **본 랩에서 사용하는 방식**
-- Multus **NetworkAttachmentDefinition**에서 확인 가능
+**用于测试环境的 MACVLAN:**
+- 类似于虚拟机的虚拟网络接口方式
+- **本实验中使用的方式**
+- 可以在 Multus **NetworkAttachmentDefinition** 中确认
 
-**아키텍처:**
+**架构:**
 ```
 ┌────────────────────────────────────┐
 │         Host System                 │
@@ -523,31 +523,31 @@ BIG-IP Next for Kubernetes는 여러 방식으로 연결할 수 있습니다.
 
 ---
 
-## 1-6. 라우터 및 클라이언트 컨테이너 생성
+## 1-6. 创建路由器和客户端容器
 
-### Free Range Routing (FRR) 라우터 배포
+### 部署 Free Range Routing (FRR) 路由器
 
-**FRR이란?**
-- 오픈 소스 라우팅 데몬 모음
-- 컨테이너화된 버전 사용
-- **infra-frr-1** 컨테이너로 배포
-- **external-net** 및 **infra_client-net**에 연결
+**什么是 FRR?**
+- 开源路由守护程序集合
+- 使用容器化版本
+- 部署为 **infra-frr-1** 容器
+- 连接到 **external-net** 和 **infra_client-net**
 
-[FRRouting 공식 문서](https://docs.frrouting.org/)
+[FRRouting 官方文档](https://docs.frrouting.org/)
 
-### 클라이언트 컨테이너 배포
+### 部署客户端容器
 
 **infra-client-1:**
-- 간단한 nginx 데모 컨테이너
-- 클라이언트 및 Egress 트래픽 관찰용
+- 简单的 nginx 演示容器
+- 用于观察客户端和 Egress 流量
 
-### Docker Compose를 사용한 컨테이너 오케스트레이션
+### 使用 Docker Compose 进行容器编排
 
 ```bash
 ./create-router-and-client-containers.sh
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 Deploy FRR and client docker container ...
 [+] Running 4/4
@@ -557,9 +557,9 @@ Deploy FRR and client docker container ...
  ✔ Container syslog-server   Started  0.5s
 ```
 
-### 최종 랩 환경
+### 最终实验环境
 
-이제 랩 환경이 완성되었습니다:
+现在实验环境已完成:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -586,46 +586,46 @@ Deploy FRR and client docker container ...
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-표준 Kubernetes 환경의 모든 구성 요소가 준비되었습니다. 이제 BIG-IP Next for Kubernetes를 배포할 준비가 완료되었습니다!
+标准 Kubernetes 环境的所有组件已就绪。现在可以开始部署 BIG-IP Next for Kubernetes 了！
 
 ---
 
-# 모듈 2: BIG-IP Next for Kubernetes 설치
+# 模块 2: 安装 BIG-IP Next for Kubernetes
 
-## 개요
+## 概览
 
-본 모듈에서는 랩 환경에서 BIG-IP Next for Kubernetes를 실행하는 데 필요한 모든 구성 요소를 설치합니다.
+在本模块中，我们将安装在实验运行环境中运行 BIG-IP Next for Kubernetes 所需的所有组件。
 
-### 중요 공지
+### 重要通知
 
-**OLM (Operator Lifecycle Manager) 기반 설치:**
+**基于 OLM (Operator Lifecycle Manager) 的安装:**
 
-본 랩은 교육 목적으로 단계별 설치 과정을 안내합니다. BIG-IP Next for Kubernetes GA (General Availability) 버전에서는 OLM 준수 Operator를 통해 설치가 구성됩니다.
+本实验出于教学目的提供分步安装过程。在 BIG-IP Next for Kubernetes GA (General Availability) 版本中，安装将通过符合 OLM 的 Operator 进行配置。
 
-**STAY CALM and Lab On!**
+**保持冷静，继续实验！**
 
-[OLM Operators 자세히 보기](https://olm.operatorframework.io/)
+[详细了解 OLM Operators](https://olm.operatorframework.io/)
 
 ---
 
-## 2-1. 커뮤니티 서비스 및 리소스 설치
+## 2-1. 安装社区服务及资源
 
-### Cert-Manager 설치
+### 安装 Cert-Manager
 
-**Cert-Manager란?**
-- 서비스 간 제로 트러스트 통신을 위한 인증서 발급 도구
-- 많은 Kubernetes 배포판에 포함된 오픈 소스 컴포넌트
-- Pod 간 통신 보안 및 정기적인 시크릿 로테이션 자동화
+**什么是 Cert-Manager?**
+- 用于服务间零信任通信的证书颁发工具
+- 包含在许多 Kubernetes 发行版中的开源组件
+- Pod 间通信安全及定期 Secret 轮转自动化
 
-[Cert-Manager 자세히 보기](https://cert-manager.io/)
+[详细了解 Cert-Manager](https://cert-manager.io/)
 
-**설치 명령:**
+**安装命令:**
 
 ```bash
 ./create-cert-manager.sh
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 Install cert-manager and cluster issuer to manage pod-to-pod certs ...
 "jetstack" has been added to your repositories
@@ -661,37 +661,37 @@ certificate.cert-manager.io/bnk-ca created
 clusterissuer.cert-manager.io/bnk-ca-cluster-issuer created
 ```
 
-### Gateway API CRD 설치
+### 安装 Gateway API CRD
 
-**Gateway API란?**
-- CNCF (Cloud Native Computing Foundation) 표준 API
-- BIG-IP Next for Kubernetes가 사용하는 리소스 정의
+**什么是 Gateway API?**
+- CNCF (Cloud Native Computing Foundation) 标准 API
+- 定义了 BIG-IP Next for Kubernetes 使用的资源
 
-[Gateway API 자세히 보기](https://gateway-api.sigs.k8s.io/)
+[详细了解 Gateway API](https://gateway-api.sigs.k8s.io/)
 
-### Prometheus 및 Grafana 설치
+### 安装 Prometheus 和 Grafana
 
 **Prometheus:**
-- 메트릭 수집 도구
-- [Prometheus 자세히 보기](https://prometheus.io/)
+- 指标收集工具
+- [详细了解 Prometheus](https://prometheus.io/)
 
 **Grafana:**
-- 텔레메트리 대시보드 시각화 도구
-- [Grafana 자세히 보기](https://github.com/grafana/grafana/blob/main/README.md)
+- 遥测仪表板可视化工具
+- [详细了解 Grafana](https://github.com/grafana/grafana/blob/main/README.md)
 
-### OTEL (OpenTelemetry) 인증서 생성
+### 生成 OTEL (OpenTelemetry) 证书
 
 **OpenTelemetry:**
-- BIG-IP Next OTEL 서비스가 안전하게 통신하기 위한 인증서
-- [OTEL 자세히 보기](https://opentelemetry.io/)
+- 用于 BIG-IP Next OTEL 服务安全通信的证书
+- [详细了解 OTEL](https://opentelemetry.io/)
 
-### 전체 컴포넌트 배포
+### 部署所有组件
 
 ```bash
 ./deploy-gatewayapi-telemetry.sh
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 Install Gateway API CRDs ...
 customresourcedefinition.apiextensions.k8s.io/backendlbpolicies.gateway.networking.k8s.io created
@@ -723,15 +723,15 @@ certificate.cert-manager.io/external-f5ingotelsvr created
 
 ---
 
-## 2-2. F5 유틸리티 클러스터 테넌트 추가
+## 2-2. 添加 F5 实用工具集群租户
 
-BIG-IP Next for Kubernetes의 모든 공유 유틸리티 컴포넌트를 적절한 네임스페이스에 배치합니다. 이를 통해 클러스터에서 이러한 리소스에 대한 접근을 적절히 보호할 수 있습니다.
+将 BIG-IP Next for Kubernetes 的所有共享实用组件放置在适当的命名空间中。这使我们能够妥善保护集群中对这些资源的访问。
 
 ```bash
 ./create-f5util-namespace.sh
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 Create f5-utils namespace for BNK supporting software
 namespace/f5-utils created
@@ -739,56 +739,56 @@ namespace/f5-utils created
 
 ---
 
-## 2-3. FAR 접근 활성화
+## 2-3. 启用 FAR 访问
 
-### F5 Artifact Registry (FAR) 소개
+### F5 Artifact Registry (FAR) 介绍
 
-클라우드 네이티브 앱은 다양한 소프트웨어 레지스트리에서 다운로드됩니다:
-- **Docker Hub**: Docker가 소개한 가장 친숙한 레지스트리
-- **Red Hat Quay**: Kubernetes 배포판 벤더 레지스트리
-- **하이퍼스케일 클라우드 제공업체 레지스트리**
+云原生应用从各种软件仓库下载:
+- **Docker Hub**: Docker 推出的最熟悉的仓库
+- **Red Hat Quay**: Kubernetes 发行版厂商仓库
+- **超大规模云提供商仓库**
 
-**프라이빗 레지스트리:**
-- mTLS 기반 인증 및 권한 부여로 소프트웨어 리소스 접근 제어
+**私有仓库:**
+- 基于 mTLS 的身份验证和授权控制软件资源访问
 
 **F5 Artifact Registry (FAR):**
-- 컨테이너 이미지, 오케스트레이션 파일, 매니페스트 파일, 유틸리티 파일 제공
-- 인증서 기반 자격 증명 필요
+- 提供容器镜像、编排文件、清单文件、实用工具文件
+- 需要基于证书的凭据
 
-### FAR 자격 증명 획득 방법
+### 如何获取 FAR 凭据
 
-**공식 프로세스:**
-1. [My F5](https://my.f5.com) 로그인 필요
-2. [FAR 자격 증명 다운로드 가이드](https://clouddocs.f5.com/bigip-next-for-kubernetes/2.0.0-LA/far.html#download-the-service-account-key)
+**官方流程:**
+1. 需要登录 [My F5](https://my.f5.com)
+2. [FAR 凭据下载指南](https://clouddocs.f5.com/bigip-next-for-kubernetes/2.0.0-LA/far.html#download-the-service-account-key)
 
-**랩 환경:**
-- 모든 사용자가 my.f5.com 접근 권한이 있는지 확신할 수 없으므로
-- FAR 인증 자격 증명을 랩 가상 머신에 미리 복사
+**实验环境:**
+- 由于不能确定所有用户都有 my.f5.com 访问权限
+- FAR 身份验证凭据已预先复制到实验虚拟机
 
-### FAR 자격 증명 확인
+### 确认 FAR 凭据
 
 ```bash
 ls far/f5-far-auth-key.tgz
 ```
 
-**출력:**
+**输出:**
 ```
 far/f5-far-auth-key.tgz
 ```
 
-### Helm 소개
+### Helm 介绍
 
 **Helm:**
-- Kubernetes 네이티브 패키지 관리자
-- [Helm 자세히 보기](https://helm.sh/)
+- Kubernetes 原生包管理器
+- [详细了解 Helm](https://helm.sh/)
 
-### FAR 레지스트리 추가
+### 添加 FAR 仓库
 
 ```bash
 ./add-far-registry.sh
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 F5 Artifacts Registry (FAR) authentication token ...
 Create the secret.yaml file with the provided content ...
@@ -797,34 +797,34 @@ secret/far-secret created
 Login Succeeded
 ```
 
-**동작:**
-1. 자격 증명을 Kubernetes Secret으로 추가
-2. FAR을 Helm 리포지토리로 추가
-3. 로그인 테스트
+**操作:**
+1. 将凭据添加为 Kubernetes Secret
+2. 将 FAR 添加为 Helm 仓库
+3. 测试登录
 
 ---
 
-## 2-4. BIG-IP Next 디버그 서비스 접근 활성화
+## 2-4. 启用 BIG-IP Next 调试服务访问
 
-클러스터 외부의 클라이언트가 클러스터 내부의 디버그 서비스와 안전하게 통신할 수 있는 방법을 생성해야 합니다.
+我们需要创建一种方法，使集群外部的客户端能够安全地与集群内部的调试服务通信。
 
-**외부 접근이 필요한 서비스:**
-- 제품 정보 수집
-- 라이센싱 보고
-- Support용 QKView 수집
-- 디버그 트래픽 접근
+**需要外部访问的服务:**
+- 产品信息收集
+- 许可报告
+- 用于 Support 的 QKView 收集
+- 调试流量访问
 
-**자격 증명 저장:**
-- Kubernetes Secrets에 저장
-- 랩 3의 데모를 위해 가상 머신 호스트의 파일에도 복사
+**保存凭据:**
+- 保存在 Kubernetes Secrets 中
+- 为模块 3 的演示，也复制到虚拟机宿主机的文件中
 
-### CWC (Cluster Wide Controller) 설치
+### 安装 CWC (Cluster Wide Controller)
 
 ```bash
 ./install-cwc.sh
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 Install Cluster Wide Controller (CWC) to manage license and debug API ...
 Pulled: repo.f5.com/utils/f5-cert-gen:0.9.1
@@ -852,25 +852,25 @@ configmap/cpcl-key-cm created
 configmap/cwc-qkview-cm created
 ```
 
-마지막 사전 준비 환경 리소스가 완료되었습니다. 이제 BIG-IP를 설치할 준비가 되었습니다!
+最后的预备环境资源已完成。现在可以安装 BIG-IP 了！
 
 ---
 
-## 2-5. BIG-IP Next for Kubernetes 배포 설치
+## 2-5. 安装 BIG-IP Next for Kubernetes 部署
 
-Helm을 사용하여 OLM 준수 Operator를 설치합니다. 이 Operator는 BIG-IP Next for Kubernetes 컴포넌트의 라이프사이클을 동적으로 오케스트레이션합니다.
+使用 Helm 安装符合 OLM 的 Operator。该 Operator 会动态编排 BIG-IP Next for Kubernetes 组件的生命周期。
 
-**Operator의 장점:**
-- Kubernetes 클러스터에서 지속적으로 실행되는 오케스트레이터
-- 자동으로 작업 수행
+**Operator 的优点:**
+- 在 Kubernetes 集群中持续运行的编排器
+- 自动执行任务
 
-### BIG-IP Next for Kubernetes 설치
+### 安装 BIG-IP Next for Kubernetes
 
 ```bash
 ./install-bnk.sh
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 Install BNK ...
 configmap/bnk-bgp created
@@ -889,42 +889,42 @@ TEST SUITE: None
 ..../create
 ```
 
-**Orchestrator 동작:**
-- 지속적으로 실행되며 리소스 추가 또는 변경 모니터링
-- BIG-IP에서 오케스트레이션 필요 시 자동 처리
+**Orchestrator 操作:**
+- 持续运行并监控资源添加或更改
+- 在 BIG-IP 需要编排时自动处理
 
-### Orchestrator Pod 확인
+### 确认 Orchestrator Pod
 
 ```bash
 kubectl get pod | grep orchestrator
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 orchestrator-f5cbc78cf-kfgxx        1/1     Running   0          1m
 ```
 
-**설치 완료!**
-- 노드 레이블링
-- Orchestrator 설치
-- BOOM! 설치 완료
+**安装完成！**
+- 节点打标签
+- 安装 Orchestrator
+- 砰！安装完成
 
 ---
 
-## 2-6. NVIDIA DPU 노드의 BIG-IP Next
+## 2-6. NVIDIA DPU 节点上的 BIG-IP Next
 
-### DPU 모드 시뮬레이션
+### 模拟 DPU 模式
 
-본 설치에서는 두 개의 노드를 레이블링하고 BIG-IP Next 전용으로 할당했습니다. 반드시 이렇게 해야 하는 것은 아니지만, NVIDIA DPU의 모습을 시뮬레이션합니다.
+在本次安装中，我们标记了两个节点并将其专门分配给 BIG-IP Next。虽然不必非要这样做，但这模拟了 NVIDIA DPU 的呈现方式。
 
-### NVIDIA BlueField-3 DPU 모드
+### NVIDIA BlueField-3 DPU 模式
 
-**DPU 활성화 시:**
-- 클러스터에서 별도의 노드로 표시됨
-- 동일한 방식으로 노드 레이블링
-- Operator가 동일한 방식으로 설치 수행
+**启用 DPU 时:**
+- 在集群中显示为独立节点
+- 以相同方式对节点打标签
+- Operator 以相同方式执行安装
 
-**아키텍처:**
+**架构:**
 
 ```
 ┌────────────────────────────────────────────────────────────┐
@@ -948,29 +948,29 @@ orchestrator-f5cbc78cf-kfgxx        1/1     Running   0          1m
 └────────────────────────────────────────────────────────────┘
 ```
 
-**Kubernetes 노드 뷰:**
+**Kubernetes 节点视图:**
 ```
 NAME                     STATUS   ROLES           AGE   VERSION
 bnk-control-plane        Ready    control-plane   1h    v1.32.0
 bnk-host-1               Ready    <none>          1h    v1.32.0
 bnk-host-2               Ready    <none>          1h    v1.32.0
 bnk-host-3               Ready    <none>          1h    v1.32.0
-bnk-bf3-dpu-1            Ready    <none>          1h    v1.32.0  ← DPU Node
-bnk-bf3-dpu-2            Ready    <none>          1h    v1.32.0  ← DPU Node
-bnk-bf3-dpu-3            Ready    <none>          1h    v1.32.0  ← DPU Node
+bnk-bf3-dpu-1            Ready    <none>          1h    v1.32.0  ← DPU 节点
+bnk-bf3-dpu-2            Ready    <none>          1h    v1.32.0  ← DPU 节点
+bnk-bf3-dpu-3            Ready    <none>          1h    v1.32.0  ← DPU 节点
 ```
 
 ---
 
-## 2-7. Ingress 및 Egress용 Kubernetes 테넌트 네트워크 생성
+## 2-7. 创建用于 Ingress 和 Egress 的 Kubernetes 租户网络
 
-Blue 및 Red 테넌트를 위한 네트워크를 생성합니다.
+为 Blue 和 Red 租户创建网络。
 
 ```bash
 ./create-tenants.sh
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 Create red tenant namespace...
 Error from server (AlreadyExists): namespaces "red" already exists
@@ -1021,24 +1021,24 @@ f5bigloghslpub.k8s.f5net.com/logpublisher created
 f5biglogprofile.k8s.f5net.com/logprofile created
 ```
 
-### 생성된 리소스
+### 生成的资源
 
-**네임스페이스:**
-- `red`: Red 테넌트
-- `blue`: Blue 테넌트
+**命名空间:**
+- `red`: Red 租户
+- `blue`: Blue 租户
 
-**네트워크 리소스:**
-- **F5SPKVlan**: Ingress용 VLAN (external, egress)
-- **F5SPKVxlan**: Egress용 VXLAN (red, blue)
-- **F5SPKSnatpool**: Egress SNAT 풀 (red-snat, blue-snat)
-- **F5SPKEgress**: Egress 설정 (red-egress, blue-egress)
+**网络资源:**
+- **F5SPKVlan**: 用于 Ingress 的 VLAN (external, egress)
+- **F5SPKVxlan**: 用于 Egress 的 VXLAN (red, blue)
+- **F5SPKSnatpool**: Egress SNAT 池 (red-snat, blue-snat)
+- **F5SPKEgress**: Egress 配置 (red-egress, blue-egress)
 
-**로깅:**
-- **F5BigContextGlobal**: 전역 컨텍스트
-- **F5BigLogHslpub**: 로그 퍼블리셔
-- **F5BigLogProfile**: 로그 프로파일
+**日志:**
+- **F5BigContextGlobal**: 全局上下文
+- **F5BigLogHslpub**: 日志发布器
+- **F5BigLogProfile**: 日志配置文件
 
-### 테넌트 네트워크 아키텍처
+### 租户网络架构
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -1060,41 +1060,41 @@ f5biglogprofile.k8s.f5net.com/logprofile created
 └─────────────────────────────────────────────────────────────┘
 ```
 
-BIG-IP Next for Kubernetes와 두 개의 인프라 테넌트 네트워크 설치가 성공적으로 완료되었습니다!
+BIG-IP Next for Kubernetes 和两个基础设施租户网络已成功安装！
 
-이제 모듈 3에서 BIG-IP Next for Kubernetes를 실제로 사용해보겠습니다.
-
----
-
-# 모듈 3: BIG-IP Next for Kubernetes 사용
-
-## 개요
-
-본 모듈에서는 멀티 테넌트 서비스에서 사용할 Gateway를 배포합니다.
-
-BIG-IP Next for Kubernetes의 핵심 목적은 Kubernetes 서비스에 대한 애플리케이션 전달을 제어하는 것입니다. Red 테넌트에 서비스를 생성해보겠습니다.
+现在，在模块 3 中，我们将实际使用 BIG-IP Next for Kubernetes。
 
 ---
 
-## 3-1. Red 테넌트 Deployment 및 Service 생성
+# 模块 3: 使用 BIG-IP Next for Kubernetes
 
-### Nginx 데모 Pod 배포
+## 概览
 
-**배포 리소스:**
-- Kubernetes **Deployment**: Nginx TCP 데모 Pod
-- Kubernetes **Service**: Deployment에 안정적인 IP 주소 제공
+在本模块中，我们将部署多租户服务中使用的 Gateway。
+
+BIG-IP Next for Kubernetes 的核心目的是控制对 Kubernetes 应用服务的交付。让我们在 Red 租户中创建一些服务。
+
+---
+
+## 3-1. 创建 Red 租户 Deployment 和 Service
+
+### 部署 Nginx 演示 Pod
+
+**部署资源:**
+- Kubernetes **Deployment**: Nginx TCP 演示 Pod
+- Kubernetes **Service**: 为 Deployment 提供稳定的 IP 地址
 
 ```bash
 kubectl apply -f resources/nginx-red-deployment.yaml
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 deployment.apps/nginx-deployment created
 service/nginx-app-svc created
 ```
 
-**리소스 구조:**
+**资源结构:**
 
 ```yaml
 # Deployment
@@ -1138,22 +1138,22 @@ spec:
 
 ---
 
-## 3-2. Ingress GatewayType, Gateway, TCPRoute 생성
+## 3-2. 创建 Ingress GatewayType, Gateway, TCPRoute
 
-### Gateway API 리소스 생성
+### 创建 Gateway API 资源
 
-이제 재미있는 부분입니다! NetOps 역할을 하여 Gateway API **GatewayClass** 및 **Gateway** 리소스를 생성합니다.
+现在是有趣的部分！我们将扮演 NetOps 角色，创建 Gateway API **GatewayClass** 和 **Gateway** 资源。
 
-### 역할 분리
+### 角色分离
 
-**NetOps 사용자:**
-- **GatewayClass** 생성: 어떤 BIG-IP Next for Kubernetes 인스턴스를 사용할지 결정
-- **Gateway** 생성: 데이터 센터 주소 및 리스너 포트 결정
+**NetOps 用户:**
+- 创建 **GatewayClass**: 决定使用哪个 BIG-IP Next for Kubernetes 实例
+- 创建 **Gateway**: 决定数据中心地址和监听器端口
 
-**DevOps 사용자:**
-- **L4Route** (또는 HTTPRoute) 생성: 어떤 Gateway를 사용할지 선택
+**DevOps 用户:**
+- 创建 **L4Route** (或 HTTPRoute): 选择要使用的 Gateway
 
-### GatewayClass 정의
+### 定义 GatewayClass
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -1166,11 +1166,11 @@ spec:
   description: "F5 BIG-IP Kubernetes Gateway"
 ```
 
-**설명:**
-- Gateway가 사용할 컨트롤러 지정
-- F5 BIG-IP Next for Kubernetes 인스턴스와 연결
+**说明:**
+- 指定 Gateway 使用的控制器
+- 与 F5 BIG-IP Next for Kubernetes 实例连接
 
-### Gateway 정의
+### 定义 Gateway
 
 ```yaml
 apiVersion: gateway.k8s.f5net.com/v1
@@ -1181,7 +1181,7 @@ metadata:
 spec:
   addresses:
   - type: "IPAddress"
-    value: 198.19.19.100        # Red 테넌트 VIP
+    value: 198.19.19.100        # Red 租户 VIP
   gatewayClassName: f5-gateway-class
   listeners:
   - name: nginx
@@ -1192,12 +1192,12 @@ spec:
       - kind: L4Route
 ```
 
-**설명:**
-- **addresses**: 외부에서 접근할 VIP (Virtual IP)
-- **listeners**: 프로토콜 및 포트 정의
-- **allowedRoutes**: 허용된 라우트 종류 지정
+**说明:**
+- **addresses**: 供外部访问的 VIP (Virtual IP)
+- **listeners**: 定义协议和端口
+- **allowedRoutes**: 指定允许的路由种类
 
-### L4Route 정의
+### 定义 L4Route
 
 ```yaml
 apiVersion: gateway.k8s.f5net.com/v1
@@ -1217,17 +1217,17 @@ spec:
       port: 80
 ```
 
-**설명:**
-- **parentRefs**: 사용할 Gateway 지정
-- **backendRefs**: 실제 백엔드 서비스 지정
+**说明:**
+- **parentRefs**: 指定要使用的 Gateway
+- **backendRefs**: 指定实际的后端服务
 
-### Gateway 리소스 배포
+### 部署 Gateway 资源
 
 ```bash
 kubectl apply -f resources/nginx-red-gw-api.yaml
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 gatewayclass.gateway.networking.k8s.io/f5-gateway-class created
 gateway.gateway.k8s.f5net.com/my-l4route-tcp-gateway created
@@ -1236,9 +1236,9 @@ l4route.gateway.k8s.f5net.com/l4-tcp-app created
 
 ---
 
-## 3-3. BIG-IP Next for Kubernetes Ingress 테스트
+## 3-3. 测试 BIG-IP Next for Kubernetes Ingress
 
-### 아키텍처 이해
+### 理解架构
 
 ```
 ┌──────────────┐                                  ┌─────────────┐
@@ -1264,13 +1264,13 @@ l4route.gateway.k8s.f5net.com/l4-tcp-app created
 └──────────────┘                             └──────────────────┘
 ```
 
-### Ingress 테스트
+### Ingress 测试
 
 ```bash
 docker exec -ti infra-client-1 curl -I http://198.19.19.100
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 HTTP/1.1 200 OK
 Server: nginx/1.27.4
@@ -1283,17 +1283,17 @@ ETag: "67a34638-267"
 Accept-Ranges: bytes
 ```
 
-성공! 클라이언트가 BIG-IP Next를 통해 Red 테넌트의 Nginx 서비스에 접근했습니다.
+成功！客户端已通过 BIG-IP Next 访问 Red 租户的 Nginx 服务。
 
-### BGP Peering 확인
+### 确认 BGP Peering
 
-**라우터가 어떻게 BIG-IP를 찾았을까?** BGP (Border Gateway Protocol) 피어링을 통해서입니다.
+**路由器是如何找到 BIG-IP 的？** 通过 BGP (Border Gateway Protocol) 对等互联。
 
 ```bash
 docker exec -ti infra-frr-1 vtysh -c "show bgp summary"
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 IPv4 Unicast Summary (VRF default):
 BGP router identifier 192.0.2.250, local AS number 65500 vrf-id 0
@@ -1312,16 +1312,16 @@ Total number of neighbors 3
 3 dynamic neighbor(s), limit 100
 ```
 
-**확인 사항:**
-- BIG-IP Next 인스턴스 두 개 (192.0.2.201, 192.0.2.202)가 라우터와 피어링됨
+**确认事项:**
+- 两个 BIG-IP Next 实例 (192.0.2.201, 192.0.2.202) 与路由器建立了对等互联
 
-### 라우팅 테이블 확인
+### 确认路由表
 
 ```bash
 docker exec -ti infra-frr-1 vtysh -c "show ip route"
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 Codes: K - kernel route, C - connected, S - static, R - RIP,
        O - OSPF, I - IS-IS, B - BGP, E - EIGRP, N - NHRP,
@@ -1341,29 +1341,29 @@ B>* 198.19.19.100/32 [20/0] via 192.0.2.201, eth1, weight 1, 00:14:18  ← Red V
 C>* 198.51.100.0/24 is directly connected, eth0, 03:26:14
 ```
 
-**주요 포인트:**
-- Red 서비스의 VIP **198.19.19.100/32**가 BGP를 통해 광고됨
-- ECMP (Equal-Cost Multi-Path)로 두 BIG-IP Next 인스턴스에 균등 분산
+**核心点:**
+- Red 服务的 VIP **198.19.19.100/32** 通过 BGP 进行通告
+- 通过 ECMP (Equal-Cost Multi-Path) 在两个 BIG-IP Next 实例间均等分配流量
 
-### 클래스 토론: ECMP 기반 Ingress 라우팅
+### 课堂讨论: 基于 ECMP 的 Ingress 路由
 
-**Virtual Server 주소:**
-- NetOps 사용자가 설정한 VIP는 라우터와 피어링된 모든 BIG-IP Next 인스턴스에서 도달 가능
+**Virtual Server 地址:**
+- 由 NetOps 用户设置的 VIP 可被与路由器建立对等互联的所有 BIG-IP Next 实例访问
 
-**그 다음 무슨 일이 일어날까?**
+**接下来会发生什么？**
 
-**옵션 1: ClusterIP를 통한 프록시 (사용 안 함)**
-- BIG-IP Next가 ClusterIP 주소로 pool member 구성
-- 하나로 포워딩하고 kube-proxy가 Endpoint Pod IP로 프록시
-- CPU 리소스 낭비 (kube-proxy 및 netfilter/iptables NAT 규칙 사용)
+**选项 1: 通过 ClusterIP 进行代理 (不使用)**
+- BIG-IP Next 使用 ClusterIP 地址配置 Pool Member
+- 转发到一个，kube-proxy 将其代理到 Endpoint Pod IP
+- 浪费 CPU 资源 (使用 kube-proxy 和 netfilter/iptables NAT 规则)
 
-**옵션 2: 직접 Endpoint Pod IP 사용 (BIG-IP Next 방식)**
-- Service와 연결된 Endpoint Pod IP 발견
-- Pod IP 주소로 pool 구성
-- 각 Pod가 배포된 노드 발견
-- 로드밸런싱된 요청을 올바른 노드 IP로 라우팅, 목적지는 Pod IP
+**选项 2: 直接使用 Endpoint Pod IP (BIG-IP Next 方式)**
+- 发现与 Service 关联的 Endpoint Pod IP
+- 使用 Pod IP 地址配置 Pool
+- 发现每个 Pod 部署的节点
+- 将负载均衡后的请求路由到正确的节点 IP，目的地为 Pod IP
 
-### Service 및 Endpoint 확인
+### 确认 Service 和 Endpoint
 
 **Red Service:**
 
@@ -1371,7 +1371,7 @@ C>* 198.51.100.0/24 is directly connected, eth0, 03:26:14
 kubectl get service -n red
 ```
 
-**출력:**
+**输出:**
 ```
 NAME            TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
 nginx-app-svc   ClusterIP   10.96.157.55   <none>        80/TCP    4m
@@ -1383,22 +1383,22 @@ nginx-app-svc   ClusterIP   10.96.157.55   <none>        80/TCP    4m
 kubectl get endpoints -n red
 ```
 
-**출력:**
+**输出:**
 ```
 NAME            ENDPOINTS           AGE
 nginx-app-svc   10.244.227.201:80   5m
 ```
 
-**BIG-IP Next의 최적화:**
-- ClusterIP를 사용하지 않고 직접 Pod IP로 라우팅
-- **kube-proxy 오버헤드 제거**
-- 상당한 CPU 사이클 절약!
+**BIG-IP Next 的优化:**
+- 不使用 ClusterIP，直接路由到 Pod IP
+- **消除 kube-proxy 开销**
+- 节省大量 CPU 周期！
 
 ---
 
-## 3-4. Red 테넌트 컨테이너에서 Egress 확인
+## 3-4. 在 Red 租户容器中确认 Egress
 
-### Egress 아키텍처
+### Egress 架构
 
 ```
 ┌──────────────┐                                  ┌─────────────┐
@@ -1422,13 +1422,13 @@ nginx-app-svc   10.244.227.201:80   5m
 └──────────────┘                             └──────────────────┘
 ```
 
-### Red SNAT Pool 확인
+### 确认 Red SNAT Pool
 
 ```bash
 kubectl describe f5-spk-snatpool red-snat
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 Name:         red-snat
 Namespace:    default
@@ -1467,19 +1467,19 @@ Status:
 Events:                    <none>
 ```
 
-**SNAT Pool 주소:**
+**SNAT Pool 地址:**
 - 192.0.2.100 (IPv4) / 2001::192:0:2:100 (IPv6)
 - 192.0.2.101 (IPv4) / 2001::192:0:2:101 (IPv6)
 
-### Egress 트래픽 테스트
+### 测试 Egress 流量
 
-Red Pod에서 외부 웹 요청을 생성하고 infra-client-1 웹 서비스가 어떤 소스 IP를 보는지 확인합니다.
+从 Red Pod 生成外部 Web 请求，并确认 infra-client-1 Web 服务看到的源 IP。
 
 ```bash
 kubectl exec -ti -n red deploy/nginx-deployment -- curl http://198.51.100.100/txt
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 ================================================
  ___ ___   ___                    _
@@ -1495,7 +1495,7 @@ kubectl exec -ti -n red deploy/nginx-deployment -- curl http://198.51.100.100/tx
       Server IP: 198.51.100.100
     Server Port: 80
 
-      Client IP: 192.0.2.100          ← Red SNAT Pool 주소!
+      Client IP: 192.0.2.100          ← Red SNAT Pool 地址！
     Client Port: 62899
 
 Client Protocol: HTTP
@@ -1506,20 +1506,20 @@ Client Protocol: HTTP
      user-agent: curl/7.88.1
 ```
 
-**성공!**
-- Red 테넌트 네임스페이스의 Pod에서 Egress 요청 발생
-- 트래픽에 SNAT가 적절히 적용됨
-- 소스 IP: **192.0.2.100** (Red SNAT Pool)
+**成功！**
+- Red 租户命名空间的 Pod 发起 Egress 请求
+- 流量已适当地应用了 SNAT
+- 源 IP: **192.0.2.100** (Red SNAT Pool)
 
-### Blue 테넌트 배포
+### 部署 Blue 租户
 
-Blue 테넌트의 전체 배포를 한 번에 수행합니다.
+一次性完成 Blue 租户的完整部署。
 
 ```bash
 kubectl apply -f ./resources/nginx-blue-deployment.yaml
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 deployment.apps/nginx-deployment created
 service/nginx-app-svc created
@@ -1527,13 +1527,13 @@ gateway.gateway.k8s.f5net.com/my-l4route-tcp-gateway created
 l4route.gateway.k8s.f5net.com/l4-tcp-app created
 ```
 
-### Blue SNAT Pool 확인
+### 确认 Blue SNAT Pool
 
 ```bash
 kubectl describe f5-spk-snatpool blue-snat
 ```
 
-**주요 부분:**
+**核心部分:**
 ```
 Spec:
   Address List:
@@ -1542,19 +1542,19 @@ Spec:
   Name:                         blue-snat
 ```
 
-### Blue Egress 테스트
+### 测试 Blue Egress
 
 ```bash
 kubectl exec -ti -n blue deploy/nginx-deployment -- curl http://198.51.100.100/txt
 ```
 
-**출력 예시:**
+**输出示例:**
 ```
 ================================================
       Server IP: 198.51.100.100
     Server Port: 80
 
-      Client IP: 192.0.2.111          ← Blue SNAT Pool 주소!
+      Client IP: 192.0.2.111          ← Blue SNAT Pool 地址！
     Client Port: 10764
 
 Client Protocol: HTTP
@@ -1562,181 +1562,181 @@ Client Protocol: HTTP
     Request URI: /txt
 ```
 
-**성공!**
-- Blue 테넌트: **192.0.2.110** 또는 **192.0.2.111**
-- Red 테넌트: **192.0.2.100** 또는 **192.0.2.101**
+**成功！**
+- Blue 租户: **192.0.2.110** 或 **192.0.2.111**
+- Red 租户: **192.0.2.100** 或 **192.0.2.101**
 
-### 네트워크 세그멘테이션의 중요성
+### 网络分段 (Segmentation) 的重要性
 
-**로깅, 관찰성, 방화벽 규칙:**
-- Egress 트래픽의 소스 IP를 확인하여 Red 및 Blue 테넌트 식별 가능
-- 단순히 소스 IP 체크만으로 Kubernetes 테넌트 구분
+**日志、可观测性、防火墙规则:**
+- 通过确认 Egress 流量的源 IP，可以识别 Red 和 Blue 租户
+- 仅通过检查源 IP 即可区分 Kubernetes 租户
 
-**AI/ML 환경에서의 중요성:**
-- GPU를 공유하는 테넌트의 트래픽 보안
-- RAG (Retrieval Augmented Generation) 사용 시
-- 특정 정책 문서 코퍼스에서 데이터 가져올 때
-- 네트워크 세그멘테이션으로 보안 보장 필수!
+**在 AI/ML 环境中的重要性:**
+- 共享 GPU 的租户的流量安全
+- 使用 RAG (Retrieval Augmented Generation) 时
+- 从特定策略文档库中获取数据时
+- 必须通过网络分段确保安全性！
 
 ---
 
-## 3-5. Grafana를 통한 BIG-IP Next 텔레메트리 탐색
+## 3-5. 通过 Grafana 探索 BIG-IP Next 遥测数据
 
-### Grafana 접속
+### 访问 Grafana
 
-랩에서 제공된 Grafana URL로 브라우저를 엽니다.
+在浏览器中打开实验提供的 Grafana URL。
 
-**기본 자격 증명:**
-- Username: **admin**
-- Password: **admin**
+**默认凭据:**
+- 用户名: **admin**
+- 密码: **admin**
 
-**로그인 후:**
-- 비밀번호 변경 요청 (진행하거나 Skip 가능)
+**登录后:**
+- 会要求修改密码 (可进行修改或跳过)
 
-### F5 BNK Dashboard 로드
+### 加载 F5 BNK Dashboard
 
-**경로:**
-1. Dashboard 메뉴로 이동
-2. F5 BNK Dashboard 로드
+**路径:**
+1. 导航到 Dashboard 菜单
+2. 加载 F5 BNK Dashboard
 
-**대시보드 구성:**
-- **TMM (Data Path)** 시각화
-- **ACL** 시각화
-- **Red 테넌트** 별도 시각화
-- **Blue 테넌트** 별도 시각화
+**仪表板配置:**
+- **TMM (Data Path)** 可视化
+- **ACL** 可视化
+- **Red 租户** 独立可视化
+- **Blue 租户** 独立可视化
 
-### 트래픽 생성 및 관찰
+### 生成并观察流量
 
-**Ingress 트래픽 생성:**
+**生成 Ingress 流量:**
 
 ```bash
-# Red 테넌트 Ingress
+# Red 租户 Ingress
 docker exec -ti infra-client-1 curl http://198.19.19.100/txt
 
-# Blue 테넌트 Ingress
+# Blue 租户 Ingress
 docker exec -ti infra-client-1 curl http://198.20.20.100/txt
 ```
 
-**Egress 트래픽 생성:**
+**生成 Egress 流量:**
 
 ```bash
-# Red 테넌트 Egress
+# Red 租户 Egress
 kubectl exec -ti -n red deploy/nginx-deployment -- curl http://198.51.100.100/txt
 
-# Blue 테넌트 Egress
+# Blue 租户 Egress
 kubectl exec -ti -n blue deploy/nginx-deployment -- curl http://198.51.100.100/txt
 ```
 
-**Grafana 대시보드 관찰:**
-- 실시간 트래픽 시각화
-- Red 및 Blue 테넌트별 통계
-- TMM 성능 메트릭
-- ACL 규칙 적용 현황
+**观察 Grafana 仪表板:**
+- 实时流量可视化
+- 按 Red 和 Blue 租户划分的统计数据
+- TMM 性能指标
+- ACL 规则应用现状
 
 ---
 
-## 랩 데모 요약
+## 实验演示摘要
 
-본 랩에서 다음 사항을 시연했습니다:
+本实验演示了以下内容:
 
-### 1. Kubernetes 클러스터 개념 및 세부사항
+### 1. Kubernetes 集群概念及细节
 
-**네트워킹:**
-- CNI 플러그인 (Calico, Multus)
-- Service 타입 (ClusterIP, NodePort, LoadBalancer)
+**网络:**
+- CNI 插件 (Calico, Multus)
+- Service 类型 (ClusterIP, NodePort, LoadBalancer)
 - Gateway API
 
-**리소스:**
+**资源:**
 - Deployment, Service, Endpoints
-- Custom Resource Definitions (CRDs)
+- 自定义资源定义 (CRDs)
 - Gateway, GatewayClass, L4Route/HTTPRoute
 
-### 2. BIG-IP Next for Kubernetes 설치 및 작동 방식
+### 2. BIG-IP Next for Kubernetes 安装及运作方式
 
-**설치 구성 요소:**
-- Cert-Manager (인증서 관리)
+**安装组件:**
+- Cert-Manager (证书管理)
 - Gateway API CRDs
-- Prometheus & Grafana (모니터링)
-- F5 Artifact Registry (FAR) 접근
+- Prometheus & Grafana (监控)
+- F5 Artifact Registry (FAR) 访问
 - Cluster Wide Controller (CWC)
 - Orchestrator
 
-**네트워크 설정:**
-- VLAN (Ingress용)
-- VXLAN (Egress용)
-- SNAT Pool
-- BGP 라우팅
+**网络配置:**
+- VLAN (用于 Ingress)
+- VXLAN (用于 Egress)
+- SNAT 池
+- BGP 路由
 
-### 3. 멀티 테넌트 애플리케이션 전달 및 보안
+### 3. 多租户应用交付及安全
 
 **Ingress:**
-- Gateway API를 통한 VIP 노출
-- ECMP 기반 로드밸런싱
-- 직접 Pod IP 라우팅 (kube-proxy 우회)
-- BGP를 통한 경로 광고
+- 通过 Gateway API 暴露 VIP
+- 基于 ECMP 的负载均衡
+- 直接 Pod IP 路由 (绕过 kube-proxy)
+- 通过 BGP 进行路径通告
 
 **Egress:**
-- 테넌트별 SNAT Pool
-- VXLAN을 통한 네트워크 세그멘테이션
-- 소스 IP 기반 트래픽 식별
+- 按租户划分的 SNAT 池
+- 通过 VXLAN 实现网络分段
+- 基于源 IP 的流量识别
 
-**모니터링:**
-- Prometheus 메트릭 수집
-- Grafana 시각화
-- 테넌트별 텔레메트리
+**监控:**
+- Prometheus 指标收集
+- Grafana 可视化
+- 按租户划分的遥测数据
 
 ---
 
-## 추가 학습 리소스
+## 更多学习资源
 
-**공식 문서:**
-- [BIG-IP Next for Kubernetes 공식 문서](https://clouddocs.f5.com/bigip-next-for-kubernetes/latest/)
-- [Gateway API 공식 사이트](https://gateway-api.sigs.k8s.io/)
-- [Kubernetes 네트워킹](https://kubernetes.io/docs/concepts/cluster-administration/networking/)
+**官方文档:**
+- [BIG-IP Next for Kubernetes 官方文档](https://clouddocs.f5.com/bigip-next-for-kubernetes/latest/)
+- [Gateway API 官方网站](https://gateway-api.sigs.k8s.io/)
+- [Kubernetes 网络](https://kubernetes.io/docs/concepts/cluster-administration/networking/)
 
-**F5 리소스:**
+**F5 资源:**
 - [F5 DevCentral](https://community.f5.com/)
 - [F5 Support](https://support.f5.com/)
-- [NVIDIA BlueField-3 통합 가이드](https://f5devcentral.github.io/f5-bnk-nvidia-bf3-installations/)
+- [NVIDIA BlueField-3 集成指南](https://f5devcentral.github.io/f5-bnk-nvidia-bf3-installations/)
 
-**관련 기술:**
+**相关技术:**
 - [Calico CNI](https://docs.tigera.io/calico/latest/about)
 - [Multus CNI](https://github.com/k8snetworkplumbingwg/multus-cni)
 - [KinD (Kubernetes in Docker)](https://kind.sigs.k8s.io/)
-- [Helm 패키지 매니저](https://helm.sh/)
+- [Helm 包管理器](https://helm.sh/)
 - [FRRouting](https://docs.frrouting.org/)
 
 ---
 
-## 결론
+## 结论
 
-본 랩을 통해 다음을 학습했습니다:
+通过本实验，您学习了:
 
-1. **Kubernetes 기초**
-   - 클러스터 구성 및 네트워킹
-   - CNI 플러그인 작동 방식
-   - Service 및 Gateway API
+1. **Kubernetes 基础**
+   - 集群构成及网络
+   - CNI 插件运作方式
+   - Service 及 Gateway API
 
-2. **BIG-IP Next for Kubernetes 설치**
-   - 전체 설치 프로세스
-   - 필수 컴포넌트 구성
-   - 멀티 테넌트 네트워크 설정
+2. **BIG-IP Next for Kubernetes 安装**
+   - 完整安装流程
+   - 必需组件配置
+   - 多租户网络配置
 
-3. **실제 사용**
-   - Gateway API를 통한 애플리케이션 노출
-   - Ingress 및 Egress 트래픽 관리
-   - 텔레메트리 및 모니터링
+3. **实际使用**
+   - 通过 Gateway API 暴露应用
+   - Ingress 及 Egress 流量管理
+   - 遥测及监控
 
-**주요 장점:**
-- **성능 최적화**: kube-proxy 우회, 직접 Pod IP 라우팅
-- **네트워크 세그멘테이션**: 테넌트별 SNAT Pool
-- **확장성**: ECMP 기반 로드밸런싱
-- **관찰성**: Prometheus/Grafana 통합
-- **표준 준수**: Gateway API, OLM Operator
+**主要优点:**
+- **性能优化**: 绕过 kube-proxy，直接 Pod IP 路由
+- **网络分段**: 按租户划分 SNAT 池
+- **扩展性**: 基于 ECMP 的负载均衡
+- **可观测性**: 集成 Prometheus/Grafana
+- **符合标准**: Gateway API, OLM Operator
 
 ---
 
-**문서 작성일**: 2024년 12월  
-**번역자**: Claude (AI Assistant)  
-**원문 출처**: F5 BIG-IP Next Training Lab  
-**버전**: Latest
+**文档编写日期**: 2024年 12月  
+**翻译者**: Claude (AI Assistant)  
+**原文出处**: F5 BIG-IP Next Training Lab  
+**版本**: Latest

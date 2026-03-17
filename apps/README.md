@@ -1,8 +1,8 @@
-# Cafe 애플리케이션 - HTTP/HTTPS 배포
+# Cafe 应用程序 - HTTP/HTTPS 部署
 
-## 🚀 빠른 시작
+## 🚀 快速入门
 
-### 1. TLS 인증서 생성 및 적용
+### 1. 生成并应用 TLS 证书
 
 ```bash
 chmod +x create-tls-cert.sh
@@ -10,61 +10,61 @@ chmod +x create-tls-cert.sh
 kubectl apply -f cafe-tls-secret.yaml
 ```
 
-### 2. 애플리케이션 배포
+### 2. 部署应用程序
 
 ```bash
 kubectl apply -f cafe-app.yaml
 ```
 
-### 3. 테스트
+### 3. 测试
 
 ```bash
-# HTTP (포트 80)
+# HTTP (端口 80)
 curl http://cafe.example.com/coffee
 curl http://cafe.example.com/tea
 
-# HTTPS (포트 443)
+# HTTPS (端口 443)
 curl -k https://cafe.example.com/coffee
 curl -k https://cafe.example.com/tea
 ```
 
-## 📁 파일 구조
+## 📁 文件结构
 
 ```
 .
-├── cafe-app.yaml                      # 메인 애플리케이션 매니페스트 (Ingress 포함)
-├── create-tls-cert.sh                 # TLS 인증서 생성 스크립트
-├── cafe-app-with-certmanager.yaml     # cert-manager 사용 버전 (프로덕션 권장)
-├── DEPLOYMENT-GUIDE.md                # 상세 배포 가이드
-└── README.md                          # 이 파일
+├── cafe-app.yaml                      # 主应用程序清单 (包含 Ingress)
+├── create-tls-cert.sh                 # TLS 证书生成脚本
+├── cafe-app-with-certmanager.yaml     # cert-manager 使用版本 (建议生产环境使用)
+├── DEPLOYMENT-GUIDE.md                # 详细部署指南
+└── README.md                          # 本文件
 ```
 
-## 📋 주요 변경사항
+## 📋 主要变更事项
 
 - ✅ Service Type: NodePort → ClusterIP
-- ✅ Ingress 추가: HTTP(80) 및 HTTPS(443) 지원
-- ✅ TLS/SSL: Self-signed 인증서 지원
-- ✅ Path 기반 라우팅: `/coffee`, `/tea`
+- ✅ 添加 Ingress: 支持 HTTP(80) 及 HTTPS(443)
+- ✅ TLS/SSL: 支持自签名证书
+- ✅ 基于路径的路由: `/coffee`, `/tea`
 
-## 🔐 보안 참고사항
+## 🔐 安全注意事项
 
-⚠️ **Self-signed 인증서는 개발/테스트용입니다!**
+⚠️ **自签名证书仅用于开发/测试！**
 
-프로덕션 환경에서는:
-- cert-manager + Let's Encrypt 사용 (`cafe-app-with-certmanager.yaml` 참조)
-- 또는 상용 CA 인증서 사용
+在生产环境中：
+- 使用 cert-manager + Let's Encrypt (参见 `cafe-app-with-certmanager.yaml`)
+- 或使用商业 CA 证书
 
-## 📖 상세 문서
+## 📖 详细文档
 
-전체 가이드는 [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md) 참조
+完整指南请参阅 [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md)
 
-## 🛠️ 사전 요구사항
+## 🛠️ 前提条件
 
-- Kubernetes 클러스터
-- Ingress Controller (NGINX 권장)
+- Kubernetes 集群
+- Ingress Controller (建议使用 NGINX)
 - kubectl
 - openssl
 
-## 💡 도움말
+## 💡 帮助
 
-문제가 발생하면 [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md)의 트러블슈팅 섹션을 확인하세요.
+如果遇到问题，请查看 [DEPLOYMENT-GUIDE.md](DEPLOYMENT-GUIDE.md) 的故障排除部分。
